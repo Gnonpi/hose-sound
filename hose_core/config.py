@@ -13,4 +13,5 @@ DSN_DB = {
     'user': os.getenv('POSTGRES_USER'),
     'password': os.getenv('POSTGRES_PASSWORD'),
 }
+POSTGRES_DSN = 'postgresql://{user}:{password}@{host}:{port}/{dbname}'.format(**DSN_DB)
 
