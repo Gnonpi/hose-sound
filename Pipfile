@@ -1,0 +1,24 @@
+[[source]]
+
+verify_ssl = true
+name = "pypi"
+url = "https://pypi.python.org/simple"
+
+
+[requires]
+
+python_version = "3.6"
+
+
+[dev-packages]
+
+pytest = "*"
+ipython = "*"
+
+
+[packages]
+
+"psycopg2" = "*"
+python-dotenv = "*"
+sqlalchemy = "*"
+pendulum = "*"
