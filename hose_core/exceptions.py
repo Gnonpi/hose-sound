@@ -4,7 +4,16 @@ class HoseError(Exception):
     """
 
 
-class UserNotBelongingToHose(HoseError):
+class NoHoseBetweenUsersError(HoseError):
+    def __init__(self, id_user_a, id_user_b):
+        self.id_user_a = id_user_a
+        self.id_user_b = id_user_b
+
+    def __str__(self):
+        return f"No Hose between user#{self.id_user_a} and user#{self.id_user_b}"
+
+
+class UserNotBelongingToHoseError(HoseError):
     def __init__(self, user_passed, hose):
         self.id_user_passed = user_passed.id_user
         self.id_hose = hose.id_hose

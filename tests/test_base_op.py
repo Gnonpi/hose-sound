@@ -1,9 +1,9 @@
 import pytest
 
-from hose_core.exceptions import UserNotBelongingToHose
+from hose_core.exceptions import UserNotBelongingToHoseError
 from hose_core.models import Session, HoseUser, Hose, Content, ContentType
 from hose_core.models import Base, engine
-from hose_core.base_operation import create_hoseuser, create_hose, add_content
+from hose_core.base_operation import create_hoseuser, create_hose, add_content, get_hose_between_user
 
 
 @pytest.fixture(scope='class')
@@ -103,6 +103,62 @@ class TestCreateHose:
 
 
 @pytest.mark.usefixtures('create_tables')
+class TestGetHoseBetweenUsers:
+    @pytest.fixture(autouse=True)
+    def clean_tables(self):
+        session = Session()
+        session.query(Content).delete()
+        session.query(ContentType).delete()
+        session.query(Hose).delete()
+        session.query(HoseUser).delete()
+        session.commit()
+        session.close()
+
+    def test_no_hose_between_users(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = get_hose_between_user(user_a, user_b)
+        assert id_hose is None
+
+    def test_hose_only_one_user(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        id_user_c = create_hoseuser('user-c', 'test-c@test.com', 'hashedpsswd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        user_c = session.query(HoseUser).filter_by(name='user-c').one()
+        id_hose_ac = create_hose(user_a, user_c)
+        id_hose_ab = get_hose_between_user(user_a, user_b)
+        assert id_hose_ab is None
+
+    def test_user_wrong_order(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        assert id_user_a < id_user_b
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose_db = create_hose(user_a, user_b)
+        id_hose_get = get_hose_between_user(user_b, user_a)
+        assert id_hose_db == id_hose_get
+
+    def test_get_hose_between_users(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        assert id_user_a < id_user_b
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose_db = create_hose(user_a, user_b)
+        id_hose_get = get_hose_between_user(user_a, user_b)
+        assert id_hose_db == id_hose_get
+
+
+@pytest.mark.usefixtures('create_tables')
 class TestCreateContent:
     @pytest.fixture(autouse=True)
     def clean_tables(self):
@@ -126,7 +182,7 @@ class TestCreateContent:
         id_hose = create_hose(user_a, user_b)
         hose = session.query(Hose).filter_by(id_hose=id_hose).one()
 
-        with pytest.raises(UserNotBelongingToHose) as ex:
+        with pytest.raises(UserNotBelongingToHoseError) as ex:
             id_content = add_content(user_c, hose, 'path', 'youtube-link')
 
     def test_create_content_type_if_needed(self):

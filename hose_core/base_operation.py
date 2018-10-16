@@ -1,6 +1,6 @@
 from typing import Union, List
 
-from hose_core.exceptions import UserNotBelongingToHose
+from hose_core.exceptions import UserNotBelongingToHoseError, NoHoseBetweenUsersError
 from hose_core.models import HoseUser, Session, Hose, Content, ContentType
 
 
@@ -44,6 +44,24 @@ def create_hose(user_a: HoseUser, user_b: HoseUser) -> Union[int, None]:
     return id_hose
 
 
+def get_hose_between_user(user_a: HoseUser, user_b: HoseUser) -> Union[int, None]:
+    """
+    Retrieve the Hose between two users, return None if there is no Hose
+
+    :param user_a:
+    :param user_b:
+    :return:
+    """
+    if user_a.id_user > user_b.id_user:
+        user_a, user_b = user_b, user_a
+    session = Session()
+    hose = session.query(Hose).filter_by(id_user_a=user_a.id_user, id_user_b=user_b.id_user).first()
+    if hose is not None:
+        return hose.id_hose
+    else:
+        return None
+
+
 def add_content(user_adding: HoseUser, hose: Hose, source_path: str, content_type: str) -> int:
     """
     A user can add content to the Hose
@@ -56,7 +74,7 @@ def add_content(user_adding: HoseUser, hose: Hose, source_path: str, content_typ
     """
     session = Session()
     if user_adding.id_user != hose.id_user_a and user_adding.id_user != hose.id_user_b:
-        raise UserNotBelongingToHose(user_adding, hose)
+        raise UserNotBelongingToHoseError(user_adding, hose)
     r_content_type = session.query(ContentType).filter_by(name=content_type).first()
     if r_content_type is None:
         r_content_type = ContentType(name=content_type)
@@ -76,5 +94,15 @@ def add_content(user_adding: HoseUser, hose: Hose, source_path: str, content_typ
 
 
 def get_content_for_user(user: HoseUser, other_user: HoseUser) -> Union[List[Content]]:
+    """
+    Retrieve all content available from a hose
+
+    :param user:
+    :param other_user:
+    :return:
+    """
     if user == other_user:
         return []
+    id_hose = get_hose_between_user(user, other_user)
+    if id_hose is None:
+        raise NoHoseBetweenUsersError(user.id_user, other_user.id_user)
