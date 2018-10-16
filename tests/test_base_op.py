@@ -1,8 +1,9 @@
 import pytest
 
+from hose_core.exceptions import UserNotBelongingToHose
+from hose_core.models import Session, HoseUser, Hose, Content, ContentType
 from hose_core.models import Base, engine
-from hose_core.base_operation import create_hoseuser, create_hose
-from hose_core.models import Session, HoseUser, Hose
+from hose_core.base_operation import create_hoseuser, create_hose, add_content
 
 
 @pytest.fixture(scope='class')
@@ -21,6 +22,9 @@ class TestCreateHoseUser:
     @pytest.fixture(autouse=True)
     def clean_users(self):
         session = Session()
+        session.query(Content).delete()
+        session.query(ContentType).delete()
+        session.query(Hose).delete()
         session.query(HoseUser).delete()
         session.commit()
         session.close()
@@ -57,18 +61,36 @@ class TestCreateHose:
     @pytest.fixture(autouse=True)
     def clean_tables(self):
         session = Session()
+        session.query(Content).delete()
+        session.query(ContentType).delete()
         session.query(Hose).delete()
         session.query(HoseUser).delete()
         session.commit()
         session.close()
+
+    def test_switch_id_user(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+
+        assert id_user_a < id_user_b
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_b, user_a)
+        list_hose = session.query(Hose).filter_by(id_user_a=user_a.id_user, id_user_b=user_b.id_user).all()
+        assert len(list_hose) == 1
+        one_hose = list_hose[0]
+        assert one_hose.id_hose == id_hose
+        assert one_hose.id_user_a == id_user_a
+        assert one_hose.id_user_b == id_user_b
 
     def test_create_hose(self):
         id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
         id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
 
         session = Session()
-        user_a = session.query(HoseUser).filter_by(name='user-a').first()
-        user_b = session.query(HoseUser).filter_by(name='user-b').first()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
         id_hose = create_hose(user_a, user_b)
         list_hose = session.query(Hose).filter_by(id_user_a=user_a.id_user, id_user_b=user_b.id_user).all()
 
@@ -78,3 +100,66 @@ class TestCreateHose:
         assert one_hose.id_user_b == id_user_b
         assert one_hose.id_hose == id_hose
         session.close()
+
+
+@pytest.mark.usefixtures('create_tables')
+class TestCreateContent:
+    @pytest.fixture(autouse=True)
+    def clean_tables(self):
+        session = Session()
+        session.query(Content).delete()
+        session.query(ContentType).delete()
+        session.query(Hose).delete()
+        session.query(HoseUser).delete()
+        session.commit()
+        session.close()
+
+    def test_wrong_user_adding(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        id_user_c = create_hoseuser('user-c', 'test-c@test.com', 'hashedpsswd')
+
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        user_c = session.query(HoseUser).filter_by(name='user-c').one()
+        id_hose = create_hose(user_a, user_b)
+        hose = session.query(Hose).filter_by(id_hose=id_hose).one()
+
+        with pytest.raises(UserNotBelongingToHose) as ex:
+            id_content = add_content(user_c, hose, 'path', 'youtube-link')
+
+    def test_create_content_type_if_needed(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_a, user_b)
+        hose = session.query(Hose).filter_by(id_hose=id_hose).one()
+
+        existing_content_types = session.query(ContentType).all()
+        assert len(existing_content_types) == 0
+        id_content = add_content(user_a, hose, 'path', 'new-content-type')
+        new_content_types = session.query(ContentType).all()
+        assert len(new_content_types) == 1
+        one_content_type = new_content_types[0]
+        assert one_content_type.name == 'new-content-type'
+
+    def test_create_content(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_a, user_b)
+        hose = session.query(Hose).filter_by(id_hose=id_hose).one()
+        session.add(ContentType(id_content_type=0, name='content-type'))
+        session.commit()
+        id_content = add_content(user_a, hose, 'path', 'content-type')
+        contents = session.query(Content).all()
+        assert len(contents) == 1
+        content = contents[0]
+        assert content.id_user_origin == id_user_a
+        assert content.id_hose == id_hose
+        assert content.id_content_type == 0

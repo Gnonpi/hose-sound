@@ -25,16 +25,16 @@ class HoseUser(Base):
 
     date_joined = Column(DateTime, default=pendulum.now('UTC').to_datetime_string())
 
-    # def __eq__(self, other):
-    #     if not isinstance(other, HoseUser):
-    #         return False
-    #     return all([
-    #         # self.id_user == other.id_user,
-    #         self.name == other.name,
-    #         self.email == other.email,
-    #         self.hashed_password == other.hashed_password,
-    #         self.date_joined == other.date_joined,
-    #     ])
+    def __eq__(self, other):
+        if not isinstance(other, HoseUser):
+            return False
+        return all([
+            # self.id_user == other.id_user,
+            self.name == other.name,
+            self.email == other.email,
+            self.hashed_password == other.hashed_password,
+            self.date_joined == other.date_joined,
+        ])
 
     def __repr__(self):
         return f"<HoseUser(id_user={self.id_user}, name={self.name}, email={self.email}, " \
@@ -117,7 +117,7 @@ class Content(Base):
     id_user_origin = Column(Integer, ForeignKey('hoseuser.id_user'), nullable=False)
     id_content_type = Column(Integer, ForeignKey('content_type.id_content_type'), nullable=False)
 
-    date_added = Column(DateTime, default=pendulum.now('UTC').to_datetime_string())
+    date_inserted = Column(DateTime, default=pendulum.now('UTC').to_datetime_string())
     source_path = Column(String, nullable=False)
 
     def __eq__(self, other):
@@ -128,14 +128,14 @@ class Content(Base):
             self.id_hose == other.id_hose,
             self.id_user_origin == other.id_user_origin,
             self.id_content_type == other.id_content_type,
-            self.date_added == other.date_added,
+            self.date_inserted == other.date_inserted,
             self.source_path == other.source_path,
         ])
 
     def __repr__(self):
         return f"<Content(id_content={self.id_content}, id_hose={self.id_hose}, id_user_origin={self.id_user_origin}, " \
-               f"id_content_type={self.id_content_type}, date_added={self.date_added}, source_path={self.source_path})>"
+               f"id_content_type={self.id_content_type}, date_added={self.date_inserted}, source_path={self.source_path})>"
 
     def __str__(self):
         return f"Content({self.id_content}) added by user#{self.id_user_origin} in hose#{self.id_hose} " \
-               f"on {self.date_added} linked to {self.source_path}"
+               f"on {self.date_inserted} linked to {self.source_path}"
