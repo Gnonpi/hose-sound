@@ -106,3 +106,6 @@ def get_content_for_user(user: HoseUser, other_user: HoseUser) -> Union[List[Con
     id_hose = get_hose_between_user(user, other_user)
     if id_hose is None:
         raise NoHoseBetweenUsersError(user.id_user, other_user.id_user)
+    session = Session()
+    contents = session.query(Content).filter_by(id_hose=id_hose).all()
+    return contents

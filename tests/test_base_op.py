@@ -1,9 +1,10 @@
 import pytest
 
-from hose_core.exceptions import UserNotBelongingToHoseError
+from hose_core.exceptions import UserNotBelongingToHoseError, NoHoseBetweenUsersError
 from hose_core.models import Session, HoseUser, Hose, Content, ContentType
 from hose_core.models import Base, engine
-from hose_core.base_operation import create_hoseuser, create_hose, add_content, get_hose_between_user
+from hose_core.base_operation import create_hoseuser, create_hose, add_content, get_hose_between_user, \
+    get_content_for_user
 
 
 @pytest.fixture(scope='class')
@@ -219,3 +220,68 @@ class TestCreateContent:
         assert content.id_user_origin == id_user_a
         assert content.id_hose == id_hose
         assert content.id_content_type == 0
+
+
+@pytest.mark.usefixtures('create_tables')
+class TestGetContentForUser:
+    @pytest.fixture(autouse=True)
+    def clean_tables(self):
+        session = Session()
+        session.query(Content).delete()
+        session.query(ContentType).delete()
+        session.query(Hose).delete()
+        session.query(HoseUser).delete()
+        session.commit()
+        session.close()
+
+    def test_same_user(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        assert id_user_a < id_user_b
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_a, user_b)
+
+        contents = get_content_for_user(user_a, user_a)
+        assert contents == []
+
+    def test_no_hose_between_user(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+
+        with pytest.raises(NoHoseBetweenUsersError) as ex:
+            contents = get_content_for_user(user_a, user_b)
+
+    def test_no_content_inserted(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_a, user_b)
+
+        contents = get_content_for_user(user_a, user_b)
+        assert contents == []
+
+    def test_retrieve_content(self):
+        id_user_a = create_hoseuser('user-a', 'test-a@test.com', 'hashedp')
+        id_user_b = create_hoseuser('user-b', 'test-b@test.com', 'hashedpwd')
+        session = Session()
+        user_a = session.query(HoseUser).filter_by(name='user-a').one()
+        user_b = session.query(HoseUser).filter_by(name='user-b').one()
+        id_hose = create_hose(user_a, user_b)
+        hose = session.query(Hose).filter_by(id_hose=id_hose).one()
+
+        id_content_one = add_content(user_a, hose, 'path/one', 'content-type/one')
+        content_one = session.query(Content).filter_by(id_content=id_content_one).one()
+        id_content_two = add_content(user_a, hose, 'path/two', 'content-type/two')
+        content_two = session.query(Content).filter_by(id_content=id_content_two).one()
+        id_content_three = add_content(user_b, hose, 'path/three', 'content-type/one')
+        content_three = session.query(Content).filter_by(id_content=id_content_three).one()
+
+        contents = get_content_for_user(user_a, user_b)
+        assert contents == [content_one, content_two, content_three]
