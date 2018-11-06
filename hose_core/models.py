@@ -21,7 +21,6 @@ class HoseUser(Base):
     id_user = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     email = Column(String, nullable=False)
-    hashed_password = Column(String)
 
     date_joined = Column(DateTime, default=pendulum.now('UTC').to_datetime_string())
 
@@ -32,13 +31,14 @@ class HoseUser(Base):
             # self.id_user == other.id_user,
             self.name == other.name,
             self.email == other.email,
-            self.hashed_password == other.hashed_password,
+            # self.hashed_password == other.hashed_password,
             self.date_joined == other.date_joined,
         ])
 
     def __repr__(self):
         return f"<HoseUser(id_user={self.id_user}, name={self.name}, email={self.email}, " \
-               f"hashed_password={self.hashed_password}, date_joined={self.date_joined})>"
+               f"date_joined={self.date_joined})>"
+               # f"hashed_password={self.hashed_password}, " \
 
     def __str__(self):
         return f"HoseUser({self.id_user}) {self.name} of {self.email} since {self.date_joined}"
