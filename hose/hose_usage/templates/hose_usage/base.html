@@ -1,0 +1,18 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+</head>
+<body>
+    {% include 'hose_usage/banner.html' %}
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
