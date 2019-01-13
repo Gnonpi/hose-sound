@@ -1,0 +1,12 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+{% if latest_hoses_created %}
+    <ul>
+    {% for hose in latest_hoses_created %}
+        <li><a href="{% url 'h:detail' hose.id %}">{{ hose.hose_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No hoses are available.</p>
+{% endif %}

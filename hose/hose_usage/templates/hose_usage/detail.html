@@ -1,0 +1,12 @@
+<h1>{{ hoseassociation.hose_name }}</h1>
+{% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+{% endif %}
+<form action="{% url 'h:listen' hoseassociation.id %}" method="POST">
+{% csrf_token %}
+    {% for song in hoseassociation.hosecontent_set.all %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ song.id }}">
+            <label for="choice{{ forloop.counter }}">{{ song.name }}</label></br>
+    {% endfor %}
+    <input type="submit" value="Listen">
+</form>
