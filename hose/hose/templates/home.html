@@ -6,8 +6,16 @@
         Hi {{ user.username }}
         <p><a href="{% url 'logout' %}">Logout</a></p>
     {% else %}
-        <p>Not logged</p>
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'h:signup' %}">Register</a>
+        <div id="not-logged">
+            <p style="text-align: center">You're not currenly logged in</p>
+            <div class="container text-center" id="not-logged-buttons">
+                <a class="col" href="{% url 'login' %}">
+                    <button id="login-button" type="button" class="btn btn-primary">Login</button>
+                </a>
+                <a class="col" href="{% url 'h:signup' %}">
+                    <button id="signup-button" type="button" class="btn btn-primary">Register</button>
+                </a>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

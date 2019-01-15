@@ -1,0 +1,10 @@
+<{% extends 'hose_usage/base.html' %}
+
+{% block title %}Explore music{% endblock %}
+
+{% block content %}
+    Here are some suggestions:<br>
+    {% for song in music_suggestion %}
+        <li>{{ song.name }} from {{ song.hose_from.hose_name }}</li>
+    {% endfor %}
+{% endblock %}

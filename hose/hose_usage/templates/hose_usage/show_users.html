@@ -1,0 +1,10 @@
+<{% extends 'hose_usage/base.html' %}
+
+{% block title %}Your hosers{% endblock %}
+
+{% block content %}
+    Your hosers:<br>
+    {% for hoser in user_hosers %}
+        <li>{{ hoser.username }}</li>
+    {% endfor %}
+{% endblock %}

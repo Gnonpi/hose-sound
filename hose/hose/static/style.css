@@ -1,0 +1,41 @@
+:root {
+    --main-bg-dim: #ffd1f5;
+}
+
+body {
+    background-color: var(--main-bg-dim);
+}
+
+main {
+    background-color: white;
+    border-radius: 10px;
+    width: 95%;
+    margin: auto;
+}
+
+#img-banner {
+    width: 95%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#not-logged {
+    margin: auto;
+    width: 80%;
+}
+
+#not-logged-buttons {
+    margin: auto;
+    width: 80%;
+}
+
+#login-button {
+    width: 40%;
+    max-width: 8em;
+}
+
+#signup-button {
+    width: 40%;
+    max-width: 8em;
+}
