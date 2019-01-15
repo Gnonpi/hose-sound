@@ -1,2 +1,8 @@
-# hose-sound
-Sharing music easily with one person at a time, listening it when you want
+# Hose
+
+# Intent
+Having a website where exchanging music with someone is easy and cool.
+Users are linked by hoses. 
+
+# Installation
+

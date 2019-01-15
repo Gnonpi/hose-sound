@@ -1,0 +1,9 @@
+<h1>{{ hoseassociation.hose_name }}</h1>
+
+<ul>
+{% for song in hoseassociation.hosecontent_set.all %}
+    <li>{{ song.name }} -- {{ song.times_listened }} play{{ song.times_listened|pluralize }}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'h:detail' hoseassociation.id %}">Listen again?</a>

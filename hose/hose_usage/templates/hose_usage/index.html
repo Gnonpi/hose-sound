@@ -1,0 +1,23 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - index{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+    Hi {{ user.username }}!
+    {% if hoses_shared %}
+        <h3>Your Hoses</h3>
+        <ul>
+        {% for hose in hoses_shared %}
+            <li><a href="{% url 'h:detail' hose.id %}">
+                {{ hose.hose_name }} with {{ hose.other_name }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hoses are available.</p>
+    {% endif %}
+{% endblock %}
