@@ -1,26 +1,21 @@
 {% extends 'hose_usage/base.html' %}
 
 
-{% block title %}Hose - index{% endblock %}
+{% block title %}Hose - Your linked hoses{% endblock %}
 {% block content %}
 
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
-    Hi <b>{{ user.username }}!</b>
-    Your last login was {{ user.last_login }}
     {% if hoses_shared %}
         <h3>Your Hoses</h3>
         <ul>
         {% for hose in hoses_shared %}
             <li>
-                <a href="{% url 'h:show_hose' hose.hose_id %}">
-                {{ hose.hose_name }}
-                </a>
+                <a href="{% url 'h:show_hose' hose.hose_id %}">{{ hose.hose_name }}</a>
                 with
-                <a href="{% url 'h:show_hoser' hose.other_user_id %}">
-                {{ hose.other_user_username }}
-                </a>
+                <a href="{% url 'h:show_hoser' hose.other_user_id %}">{{ hose.other_user_username }}</a>
+                contains {{ hose.nb_songs }} song{{ hose.number_songs|pluralize }}
             </li>
         {% endfor %}
         </ul>

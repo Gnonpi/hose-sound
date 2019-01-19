@@ -4,20 +4,25 @@
     <img type="image/png" id="banner" src="{% static 'banner.png' %}" alt="banner">
     <ul class="nav">
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'h:index' %}">
+            <a class="nav-link" href="{% url 'h:home' %}">
                 <button type="button" class="btn">Home</button>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'h:find_listen' %}">
-                <button type="button" class="btn">Listen</button>
+            <a class="nav-link" href="{% url 'h:see_hoses' %}">
+                <button type="button" class="btn">Your Hoses</button>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'h:show_users' %}">
-                <button type="button" class="btn">Your hosers</button>
+            <a class="nav-link" href="{% url 'h:browse_hosers' %}">
+                <button type="button" class="btn">Meet new hosers</button>
             </a>
         </li>
+{#        <li class="nav-item">#}
+{#            <a class="nav-link" href="{% url 'h:show_users' %}">#}
+{#                <button type="button" class="btn">Your hosers</button>#}
+{#            </a>#}
+{#        </li>#}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">
                 <button type="button" class="btn">Logout</button>

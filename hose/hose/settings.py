@@ -141,5 +141,6 @@ STATICFILES_DIRS = [
     '/var/www/static/',
 ]
 
-LOGIN_REDIRECT_URL = 'h:index'
+LOGIN_URL = 'home'
+LOGIN_REDIRECT_URL = 'h:home'
 LOGOUT_REDIRECT_URL = 'home'

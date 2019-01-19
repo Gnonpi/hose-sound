@@ -9,7 +9,7 @@ class HoseUser(AbstractUser):
     Extended user class for a user of the app
     """
     def __str__(self):
-        return self.email
+        return f"(username:{self.username}, email:{self.email})"
 
 
 class HoseAssociation(models.Model):
@@ -57,6 +57,18 @@ class HoseAssociation(models.Model):
             return False
         return True
 
+    def as_dict(self):
+        return {
+            'hose_id': self.id,
+            'first_end_id': self.first_end.id,
+            'first_end_username': self.first_end.username,
+            'second_end_id': self.second_end.id,
+            'second_end_username': self.second_end.username,
+            'hose_name': self.hose_name,
+            'time_created': self.time_created,
+            'time_last_update': self.time_last_update,
+        }
+
     def __str__(self):
         return f"'{self.hose_name}'<{self.first_end}-{self.second_end}> created the {self.time_created}"
 
@@ -70,6 +82,7 @@ class HoseContent(models.Model):
         on_delete=models.CASCADE
     )
     name = models.CharField(max_length=300, default='')
+    time_added = models.DateTimeField(auto_now_add=True)
     times_listened = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -77,4 +90,4 @@ class HoseContent(models.Model):
         self.hose_from.time_last_update = datetime.now()
 
     def __str__(self):
-        return f"'{self.name}' linked to '{self.hose_from.hose_name}': {self.times_listened} times"
+        return f"'{self.name}'(added {self.time_added}) linked to '{self.hose_from.hose_name}': {self.times_listened} times"

@@ -1,14 +1,19 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 
 from . import views
 
 app_name = 'h'
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
-    path('find-music', views.find_listen, name='find_listen'),
-    path('show-users', views.ShowUsers.as_view(), name='show_users'),
-    path('<int:pk>/list', views.DetailView.as_view(), name='detail'),
-    path('<int:pk>/songs', views.ResultsView.as_view(), name='results'),
-    path('<int:hose_id>/listen', views.listen_content, name='listen'),
+    path('home/', login_required(views.HomeView.as_view()), name='home'),
+    path('hoses/', login_required(views.LinkedHosesView.as_view()), name='see_hoses'),
+    # path('demands/', views., name='see_demands'),
+    path('browse-hosers/', login_required(views.browser_hosers), name='browse_hosers'),
+    # path('browse-content/', views., name='browse_content'),
+    path('hoser/<int:hoser_id>/', login_required(views.show_hoser), name='show_hoser'),
+    path('hoser/<int:hoser_id>/ask', login_required(views.ask_for_hose_creation), name='hoser_ask'),
+    # path('hoser/<int:hoser-pk>/confirm', views., name='hoser_confirm'),
+    path('hose/<int:hose_id>/', login_required(views.show_hose), name='show_hose'),
+    # path('hose/<int:hose-pk>/<int:content-pk>', views., name='show_content'),
     path('signup/', views.SignUp.as_view(), name='signup'),
 ]

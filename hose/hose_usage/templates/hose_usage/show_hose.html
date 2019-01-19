@@ -1,0 +1,33 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - {{ hose_name }}{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+    <div>
+        Hose <i>{{ hose_name }}</i> shared with <a href="{% url 'h:show_hoser' other_id %}">{{ other_username }}</a> the {{ time_created }}.
+    </div>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Artist</th>
+                <th scope="col">Date added</th>
+                <th scope="col">Times listened</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for song in songs %}
+                <tr>
+                    <td>{{ song.name }}</td>
+                    <td>TBD</td>
+                    <td>{{ song.time_added }}</td>
+                    <td>{{ song.times_listened}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

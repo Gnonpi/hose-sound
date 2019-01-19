@@ -1,0 +1,16 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - {{ hoser_username }}{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+    <h3>Hoser <b>{{ hoser_username }}</b></h3>
+    {% if has_hose %}
+        Your Hose with {{ hoser_username }} is named
+        <a href="{% url 'h:show_hose' hose_association_id %}">
+        {{ hose_association_name }}
+    {% endif %}
+{% endblock %}

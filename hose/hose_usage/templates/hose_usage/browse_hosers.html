@@ -1,0 +1,23 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - Find Hosers{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+    These are some Hosers in the network:
+    <ul>
+    {% for hose_user in hose_users %}
+        <li>
+        <a href="{% url 'h:show_hoser' hose_user.id %}">
+            {{ hose_user.username }}
+        </a>
+        {% if hose_user.has_hose %}
+            -- You share a <a href="{% url 'h:show_hoser' hose_user.id %}">Hose</a> with that person
+        {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
