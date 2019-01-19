@@ -1,0 +1,64 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - Demands{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm">
+                <h3>Waiting for your approval</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"><h4>#</h4></th>
+                            <th scope="col">Hoser</th>
+                            <th scope="col">Received</th>
+                            <th scope="col">Accept</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for demand in received_demands %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ demand.sender.username }}</td>
+                            <td>{{ demand.time_sent }}</td>
+                            <td>
+                                <a href="{% url 'h:hoser_confirm' demand.id %}">
+                                    <button type="button" class="btn btn-primary">Confirm</button>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm">
+                <h3>Your demands</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"><h4>#</h4></th>
+                            <th scope="col">Hoser</th>
+                            <th scope="col">Sent</th>
+                            <th scope="col">Cancel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for demand in sent_demands %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ demand.receiver.username }}</td>
+                            <td>{{ demand.time_sent }}</td>
+                            <td>Cancel</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

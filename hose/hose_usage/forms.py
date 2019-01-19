@@ -1,4 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.forms import Form
 
 from .models import HoseUser
 
@@ -13,3 +14,5 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = HoseUser
         fields = ('username', 'email')
+
+

@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class HoseUser(AbstractUser):
@@ -91,3 +92,29 @@ class HoseContent(models.Model):
 
     def __str__(self):
         return f"'{self.name}'(added {self.time_added}) linked to '{self.hose_from.hose_name}': {self.times_listened} times"
+
+
+class AssociationDemand(models.Model):
+    """
+    Demand of association between two users
+    """
+    MAX_DEMANDS_SENT = 3
+
+    sender = models.ForeignKey(
+        HoseUser,
+        on_delete=models.CASCADE,
+        related_name='sender'
+    )
+    receiver = models.ForeignKey(
+        HoseUser,
+        on_delete=models.CASCADE,
+        related_name='receiver'
+    )
+    time_sent = models.DateTimeField(auto_now_add=True)
+    caduce_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(days=15))
+
+    def is_caduced(self):
+        return timezone.now() > self.caduce_at
+
+    def __str__(self):
+        return f"From {self.sender.username} to {self.receiver.username} at {self.time_sent}"

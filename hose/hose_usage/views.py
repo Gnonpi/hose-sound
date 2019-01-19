@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,7 +6,8 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 from .forms import CustomUserCreationForm
-from .models import HoseUser, HoseAssociation, HoseContent
+from .models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
+
 
 # class HoseUsageLoginRequiredMixin(LoginRequiredMixin):
 #     """Custom mixin for login required"""
@@ -109,6 +110,7 @@ def show_hoser(request, hoser_id):
 
 
 def show_hose(request, hose_id):
+    """Show the details of one Hose"""
     user_id = request.user.id
     ha = get_object_or_404(HoseAssociation, pk=hose_id)
     if user_id != ha.first_end.id and user_id != ha.second_end.id:
@@ -130,8 +132,83 @@ def show_hose(request, hose_id):
 
 
 def ask_for_hose_creation(request, hoser_id):
-    user_id = request.user.id
-    return HttpResponse(f'Asking Hose with: {hoser_id}')
+    """Ask another Hoser to create a Hose"""
+    user_demands = AssociationDemand.objects.filter(sender=request.user).count()
+    if user_demands > AssociationDemand.MAX_DEMANDS_SENT:
+        messages.error(request, 'You already send too many demands')
+        return redirect(reverse('h:show_hoser'))
+    other = get_object_or_404(HoseUser, pk=hoser_id)
+    demand = AssociationDemand(
+        sender=request.user,
+        receiver=other,
+    )
+    demand.save()
+    messages.success(request, f'Demand sent to {other.username}')
+    return redirect(reverse('h:home'))
+
+
+def _delete_caduced_demands(list_demands):
+    """Remove caduced demands from the list"""
+    filtered_demands = []
+    for demand in list_demands:
+        if demand.is_caduced():
+            demand.delete()
+        else:
+            filtered_demands.append(demand)
+    return filtered_demands
+
+
+def see_hose_demands(request):
+    """See all sent or received demands"""
+    sent_demands = AssociationDemand.objects.filter(sender=request.user). \
+        order_by('-time_sent').all()
+    received_demands = AssociationDemand.objects.filter(receiver=request.user). \
+        order_by('-time_sent').all()
+    sent_demands = _delete_caduced_demands(sent_demands)
+    received_demands = _delete_caduced_demands(received_demands)
+
+    template_name = 'hose_usage/see_demands.html'
+    context = {
+        'sent_demands': sent_demands,
+        'received_demands': received_demands,
+    }
+    return render(request, template_name, context)
+
+
+def confirm_hose_creation(request, demand_id):
+    """Let a user confirm the creation of a Hose with another one after receiving demand"""
+    demand = get_object_or_404(AssociationDemand, pk=demand_id)
+    if demand.is_caduced():
+        messages.error(request, 'Demand has caduced')
+        return redirect(reverse('h:home'))
+    # Create a new Hose with first end the current user
+    try:
+        second = HoseUser.objects.get(pk=demand.sender.id)
+    except HoseUser.DoesNotExist as ex:
+        messages.error(request, 'Hoser accound has been deleted')
+        return redirect(reverse('h:home'))
+    else:
+        ha = HoseAssociation(
+            first_end=request.user,
+            second_end=second,
+            hose_name='-'.join([request.user.username, second.username])
+        )
+        ha.save()
+        return redirect(reverse('h:show_hose', kwargs={'hose_id': ha.id}))
+
+
+def cancel_hose_creation(request, hoser_id):
+    """Delete the demand to create a Hose"""
+    try:
+        receiver = HoseUser.objects.filter(pk=hoser_id).first()
+    except HoseUser.DoesNotExist as ex:
+        messages.error(request, 'Hoser account has been deleted')
+        return redirect(reverse('h:home'))
+    else:
+        demand = get_object_or_404(AssociationDemand, sender=request.user, receiver=receiver)
+        demand.delete()
+        messages.info('Demand was canceled')
+        return redirect(reverse('h:home'))
 
 
 class SignUp(generic.CreateView):
