@@ -1,3 +1,13 @@
+:root {
+    --main-bg-dim: #ffd1f5;
+    --body-bg-dim: #fffafa;  /* snow */
+}
+
+header {
+    background-color: var(--body-bg-dim);
+    border-bottom: gray dot-dash 1px;
+}
+
 #banner {
     width: 100%;
     max-width: 1000px;

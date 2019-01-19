@@ -32,6 +32,13 @@ class HoseAssociation(models.Model):
     time_created = models.DateField(auto_now_add=True)
     time_last_update = models.DateTimeField(auto_now_add=True)
 
+    # @classmethod
+    # def get_hose_association_with_user(cls, hose_user):
+    #     user_id = hose_user.id
+    #     has = HoseAssociation.objects. \
+    #         filter(Q(first_end__id=user_id) | Q(second_end__id=user_id)).all()
+    #     return has
+
     def get_other_end(self, name):
         """
         Flip-flop ends of names

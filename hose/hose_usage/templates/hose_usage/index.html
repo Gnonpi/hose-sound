@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
     <div class="jumbotron">
-        Hi <b>{{ user.username }}!</b>
+        Hi <b>{{ user.username }}</b>!
         Your last login was {{ user.last_login }}
     </div>
     {% if hoses_shared %}

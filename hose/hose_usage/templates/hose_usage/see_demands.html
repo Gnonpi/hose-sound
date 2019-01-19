@@ -53,7 +53,11 @@
                             <th scope="row">{{ forloop.counter }}</th>
                             <td>{{ demand.receiver.username }}</td>
                             <td>{{ demand.time_sent }}</td>
-                            <td>Cancel</td>
+                            <td>
+                                <a href="{% url 'h:hoser_cancel' demand.id %}">
+                                    <button type="button" class="btn btn-light">Cancel</button>
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

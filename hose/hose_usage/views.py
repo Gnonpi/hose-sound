@@ -9,12 +9,6 @@ from .forms import CustomUserCreationForm
 from .models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 
 
-# class HoseUsageLoginRequiredMixin(LoginRequiredMixin):
-#     """Custom mixin for login required"""
-#     login_url = '/login/'
-#     redirect_field_name = 'redirect_to'
-
-
 class HomeView(generic.ListView):
     """Home view of user"""
     template_name = 'hose_usage/index.html'
