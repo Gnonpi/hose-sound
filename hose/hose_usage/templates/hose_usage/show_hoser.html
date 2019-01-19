@@ -7,10 +7,14 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
-    <h3>Hoser <b>{{ hoser_username }}</b></h3>
-    {% if has_hose %}
-        Your Hose with {{ hoser_username }} is named
-        <a href="{% url 'h:show_hose' hose_association_id %}">
-        {{ hose_association_name }}
-    {% endif %}
+    <div>
+        <h3>Hoser <b>{{ hoser_username }}</b></h3>
+        {% if has_hose %}
+            <div>
+                Your Hose with {{ hoser_username }} is named
+                <a href="{% url 'h:show_hose' hose_association_id %}">
+                    {{ hose_association_name }}.</a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

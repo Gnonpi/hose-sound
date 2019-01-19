@@ -27,11 +27,11 @@ class HomeView(generic.ListView):
         results = []
         for ha in h_associations:
             ha_dict = ha.as_dict()
+            nb_songs = HoseContent.objects.filter(hose_from__id=ha.id).count()
+            ha_dict['nb_songs'] = nb_songs
             if ha_dict['first_end_id'] == user_id:
-                ha_dict['other_user_id'] = ha_dict['second_end_id']
                 ha_dict['other_user_username'] = ha_dict['second_end_username']
             else:
-                ha_dict['other_user_id'] = ha_dict['first_end_id']
                 ha_dict['other_user_username'] = ha_dict['first_end_username']
             results.append(ha_dict)
         return results
@@ -52,10 +52,8 @@ class LinkedHosesView(generic.ListView):
             nb_songs = HoseContent.objects.filter(hose_from__id=ha.id).count()
             ha_dict = ha.as_dict()
             if ha_dict['first_end_id'] == user_id:
-                ha_dict['other_user_id'] = ha_dict['second_end_id']
                 ha_dict['other_user_username'] = ha_dict['second_end_username']
             else:
-                ha_dict['other_user_id'] = ha_dict['first_end_id']
                 ha_dict['other_user_username'] = ha_dict['first_end_username']
             ha_dict['nb_songs'] = nb_songs
             results.append(ha_dict)
@@ -132,6 +130,7 @@ def show_hose(request, hose_id):
 
 
 def ask_for_hose_creation(request, hoser_id):
+    user_id = request.user.id
     return HttpResponse(f'Asking Hose with: {hoser_id}')
 
 

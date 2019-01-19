@@ -2,20 +2,26 @@
 
 <header>
     <img type="image/png" id="banner" src="{% static 'banner.png' %}" alt="banner">
-    <ul class="nav">
+    <ul class="nav justify-content-around">
         <li class="nav-item">
             <a class="nav-link" href="{% url 'h:home' %}">
-                <button type="button" class="btn">Home</button>
+                <button type="button" class="btn btn-light">
+                    Home
+                </button>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'h:see_hoses' %}">
-                <button type="button" class="btn">Your Hoses</button>
+                <button type="button" class="btn btn-light">
+                    Your Hoses
+                </button>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'h:browse_hosers' %}">
-                <button type="button" class="btn">Meet new hosers</button>
+                <button type="button" class="btn btn-light">
+                    Meet new hosers
+                </button>
             </a>
         </li>
 {#        <li class="nav-item">#}
@@ -25,7 +31,9 @@
 {#        </li>#}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">
-                <button type="button" class="btn">Logout</button>
+                <button type="button" class="btn btn-light">
+                    Logout
+                </button>
             </a>
         </li>
     </ul>

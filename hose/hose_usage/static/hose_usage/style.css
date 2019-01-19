@@ -3,6 +3,6 @@
     max-width: 1000px;
 }
 
-li a {
-    color: green
+#banner-nav .nav-item {
+    font-size: 500%;
 }

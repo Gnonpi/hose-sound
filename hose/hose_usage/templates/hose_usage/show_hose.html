@@ -24,17 +24,21 @@
             </tr>
         </thead>
         <tbody>
-            {% for song in songs %}
-                <tr>
-                    <td>
-                        <span class="oi oi-media-play" title="media play" aria-hidden="true"></span>
-                    </td>
-                    <td>{{ song.name }}</td>
-                    <td>TBD</td>
-                    <td>{{ song.time_added }}</td>
-                    <td>{{ song.times_listened}}</td>
-                </tr>
-            {% endfor %}
+            {% if songs|length > 0 %}
+                {% for song in songs %}
+                    <tr>
+                        <td>
+                            <span class="oi oi-media-play" title="media play" aria-hidden="true"></span>
+                        </td>
+                        <td>{{ song.name }}</td>
+                        <td>TBD</td>
+                        <td>{{ song.time_added }}</td>
+                        <td>{{ song.times_listened}}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td>Start sending songs now!</td></tr>
+            {% endif %}
         </tbody>
     </table>
 {% endblock %}

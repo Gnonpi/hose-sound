@@ -8,18 +8,22 @@
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
     {% if hoses_shared %}
-        <h3>Your Hoses</h3>
-        <ul>
-        {% for hose in hoses_shared %}
-            <li>
-                <a href="{% url 'h:show_hose' hose.hose_id %}">{{ hose.hose_name }}</a>
-                with
-                <a href="{% url 'h:show_hoser' hose.other_user_id %}">{{ hose.other_user_username }}</a>
-                contains {{ hose.nb_songs }} song{{ hose.number_songs|pluralize }}
-            </li>
-        {% endfor %}
-        </ul>
+        <div>
+            <h3>Your Hoses</h3>
+            <div class="list-group">
+                {% for hose in hoses_shared %}
+                    <a href="{% url 'h:show_hose' hose.hose_id %}"
+                       class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                        <font color="black">{{ hose.hose_name }} with {{ hose.other_user_username }}</font>
+                        <span class="badge badge-primary badge-pill">{{ hose.nb_songs }} song{{ hose.number_songs|pluralize }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
     {% else %}
-        <p>No hoses are available.</p>
+        <div>
+            <p>No hoses are available.</p>
+        </div>
     {% endif %}
 {% endblock %}
