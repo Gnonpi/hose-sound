@@ -131,8 +131,8 @@ def show_hose(request, hose_id):
     return render(request, template_name, context)
 
 
-def ask_for_hose_creation(request):
-    return HttpResponse('Asking Hose with:')
+def ask_for_hose_creation(request, hoser_id):
+    return HttpResponse(f'Asking Hose with: {hoser_id}')
 
 
 class SignUp(generic.CreateView):

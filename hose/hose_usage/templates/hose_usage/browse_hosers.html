@@ -8,16 +8,25 @@
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
     These are some Hosers in the network:
-    <ul>
+    <div class="card-group">
     {% for hose_user in hose_users %}
-        <li>
-        <a href="{% url 'h:show_hoser' hose_user.id %}">
-            {{ hose_user.username }}
-        </a>
-        {% if hose_user.has_hose %}
-            -- You share a <a href="{% url 'h:show_hoser' hose_user.id %}">Hose</a> with that person
-        {% endif %}
-        </li>
+        <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">
+                <a href="{% url 'h:show_hoser' hose_user.id %}">{{ hose_user.username }}</a>
+            </h4>
+            <p class="card-text">
+            {% if hose_user.has_hose %}
+                You share a <a href="{% url 'h:show_hoser' hose_user.id %}">Hose</a> with that person
+            {% else %}
+                <a href="{% url 'h:hoser_ask' hose_user.id %}">
+                <button type="button" class="btn btn-primary">
+                    Send Hose request
+                </button>
+            {% endif %}
+            </p>
+        </div>
+        </div>
     {% endfor %}
-    </ul>
+    </div>
 {% endblock %}

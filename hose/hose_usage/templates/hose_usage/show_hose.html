@@ -7,12 +7,16 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
 
-    <div>
+    <div class="jumbotron">
         Hose <i>{{ hose_name }}</i> shared with <a href="{% url 'h:show_hoser' other_id %}">{{ other_username }}</a> the {{ time_created }}.
     </div>
+    <a href="/">
+        <button type="button" class="btn btn-primary">Upload new song</button>
+    </a>
     <table class="table table-hover table-striped">
         <thead>
             <tr>
+                <th scope="col"></th>
                 <th scope="col">Name</th>
                 <th scope="col">Artist</th>
                 <th scope="col">Date added</th>
@@ -22,6 +26,9 @@
         <tbody>
             {% for song in songs %}
                 <tr>
+                    <td>
+                        <span class="oi oi-media-play" title="media play" aria-hidden="true"></span>
+                    </td>
                     <td>{{ song.name }}</td>
                     <td>TBD</td>
                     <td>{{ song.time_added }}</td>
