@@ -24,4 +24,5 @@ urlpatterns = [
     path('hoser/<int:demand_id>/confirm', login_required(views.confirm_hose_creation), name='hoser_confirm'),
     path('hoser/<int:hoser_id>/cancel', login_required(views.cancel_hose_creation), name='hoser_cancel'),
     # path('hose/<int:hose-pk>/<int:content-pk>', views., name='show_content'),
+    path('hose/<int:hose_id>/upload', login_required(views.upload_song), name='upload_song')
 ]

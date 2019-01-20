@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.forms import Form
+from django.forms import Form, FileField
 
 from .models import HoseUser
 
@@ -15,4 +15,7 @@ class CustomUserChangeForm(UserChangeForm):
         model = HoseUser
         fields = ('username', 'email')
 
+
+class UploadSongForm(Form):
+    file = FileField()
 

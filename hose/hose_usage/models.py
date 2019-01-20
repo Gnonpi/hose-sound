@@ -89,9 +89,15 @@ class HoseContent(models.Model):
         HoseAssociation,
         on_delete=models.CASCADE
     )
+    uploader = models.OneToOneField(
+        HoseUser,
+        on_delete=models.CASCADE,
+        null=True
+    )
     name = models.CharField(max_length=300, default='')
     time_added = models.DateTimeField(auto_now_add=True)
     times_listened = models.IntegerField(default=0)
+    uploaded_content = models.FileField()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

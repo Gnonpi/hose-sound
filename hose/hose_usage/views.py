@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UploadSongForm
 from .models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 
 
@@ -203,6 +203,28 @@ def cancel_hose_creation(request, hoser_id):
         demand.delete()
         messages.info('Demand was canceled')
         return redirect(reverse('h:home'))
+
+
+def handle_uploaded_file(file):
+    with open('./filename', 'wb+') as dest:
+        for chunk in file.chunks():
+            dest.write(chunk)
+
+
+def upload_song(request, hose_id):
+    ha = get_object_or_404(HoseAssociation, pk=hose_id)
+    if request.method == 'POST':
+        form = UploadSongForm(request.POST, request.FILES)
+        if form.is_valid():
+            content = HoseContent(
+                hose_from=ha,
+                uploader=request.user,
+                name=request.FILES['files'].name,
+                file_field=request.FILES['file'],
+            )
+            content.save()
+            # handle_uploaded_file(request.FILES['file'])
+            return HttpResponse('Upload is ok.')
 
 
 class SignUp(generic.CreateView):

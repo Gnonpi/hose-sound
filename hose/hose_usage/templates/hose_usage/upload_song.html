@@ -1,0 +1,15 @@
+{% extends 'hose_usage/base.html' %}
+
+
+{% block title %}Hose - Upload song{% endblock %}
+{% block content %}
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'hose_usage/style.css' %}">
+    Upload song:
+    <form class="form">
+        {% csrf_token %}
+        {{ form.as_ul }}
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+{% endblock %}
