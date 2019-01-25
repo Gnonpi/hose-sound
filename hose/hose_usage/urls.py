@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from . import views
 
@@ -24,5 +25,12 @@ urlpatterns = [
     path('hoser/<int:demand_id>/confirm', login_required(views.confirm_hose_creation), name='hoser_confirm'),
     path('hoser/<int:hoser_id>/cancel', login_required(views.cancel_hose_creation), name='hoser_cancel'),
     # path('hose/<int:hose-pk>/<int:content-pk>', views., name='show_content'),
-    path('hose/<int:hose_id>/upload', login_required(views.upload_song), name='upload_song')
+    path('hose/<int:hose_id>/upload', login_required(views.upload_song), name='upload_song'),
+
+    ## REST url
+    path('rest/hosers', views.HoseUserList.as_view(), name='rest_hose_users_list'),
+    path('rest/hoser/<int:pk>', views.HoseUserDetail.as_view(), name='rest_hose_user_detail'),
+    path('rest/hose/<int:pk>', views.HoseAssociationDetail.as_view(), name='rest_hose_detail'),
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)

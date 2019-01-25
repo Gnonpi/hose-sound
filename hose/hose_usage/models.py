@@ -87,11 +87,13 @@ class HoseContent(models.Model):
     """
     hose_from = models.ForeignKey(
         HoseAssociation,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='hose_origin'
     )
     uploader = models.OneToOneField(
         HoseUser,
         on_delete=models.CASCADE,
+        related_name='user_origin',
         null=True
     )
     name = models.CharField(max_length=300, default='')

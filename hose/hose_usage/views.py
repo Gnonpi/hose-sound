@@ -1,12 +1,17 @@
 from django.contrib import messages
-from django.db.models import F, Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.db.models import Q
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import generic
+from rest_framework import status, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .forms import CustomUserCreationForm, UploadSongForm
-from .models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
+from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer
+from hose_usage.forms import CustomUserCreationForm, UploadSongForm
+from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
+import hose_usage.permissions as hose_permissions
 
 
 class HomeView(generic.ListView):
@@ -232,3 +237,69 @@ class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
+
+
+## REST views
+class HoseUserList(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get(self, request, format=None):
+        users = HoseUser.objects.all()
+        users_serialized = HoseUserSerializer(users, many=True)
+        return Response(users_serialized.data)
+
+    def post(self, request, format=None):
+        serialized = HoseUserSerializer(data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HoseUserDetail(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get_object(self, pk):
+        user = get_object_or_404(HoseUser, pk=pk)
+        return user
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serialized = HoseUserSerializer(user)
+        return Response(serialized.data)
+
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serialized = HoseUserSerializer(user, data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data)
+        return Response(serialized.data, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class HoseAssociationDetail(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get_object(self, pk):
+        hose = get_object_or_404(HoseAssociation, pk=pk)
+        return hose
+
+    def get(self, request, pk, format=None):
+        hose = self.get_object(pk=pk)
+        serialized = HoseAssociationSerializer(hose, context={'request': request})
+        return Response(serialized.data)
+
+    def post(self, request, format=None):
+        serialized = HoseAssociationSerializer(data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
