@@ -8,7 +8,7 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer
+from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer, HoseContentSerializer
 from hose_usage.forms import CustomUserCreationForm, UploadSongForm
 from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 import hose_usage.permissions as hose_permissions
@@ -303,3 +303,14 @@ class HoseAssociationDetail(APIView):
             serialized.save()
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
+
+class HoseContentList(APIView):
+    permission_classes = (permissions.IsAuthenticated, hose_permissions.IsOwnerOf,)
+
+    def get(self, request, format=None):
+        accessible_hose = HoseAssociation.objects.filter(
+            Q(first_end=request.user) | Q(second_end=request.user)
+        )
+        contents = HoseContent.objects.filter(hose_from__in=accessible_hose).all()
+        contents_serialized = HoseContentSerializer(contents, many=True)
+        return Response(contents_serialized.data, status=status.HTTP_200_OK)

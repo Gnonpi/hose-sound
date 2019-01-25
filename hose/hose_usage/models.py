@@ -118,12 +118,12 @@ class AssociationDemand(models.Model):
     sender = models.ForeignKey(
         HoseUser,
         on_delete=models.CASCADE,
-        related_name='sender'
+        related_name='sender_origin'
     )
     receiver = models.ForeignKey(
         HoseUser,
         on_delete=models.CASCADE,
-        related_name='receiver'
+        related_name='receiver_origin'
     )
     time_sent = models.DateTimeField(auto_now_add=True)
     caduce_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(days=15))

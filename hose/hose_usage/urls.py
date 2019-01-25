@@ -31,6 +31,7 @@ urlpatterns = [
     path('rest/hosers', views.HoseUserList.as_view(), name='rest_hose_users_list'),
     path('rest/hoser/<int:pk>', views.HoseUserDetail.as_view(), name='rest_hose_user_detail'),
     path('rest/hose/<int:pk>', views.HoseAssociationDetail.as_view(), name='rest_hose_detail'),
+    path('rest/songs', views.HoseContentList.as_view(), name='rest_songs_list'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
