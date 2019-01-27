@@ -1,0 +1,54 @@
+:root {
+    --main-bg-dim: #ffd1f5;
+    --body-bg-dim: #fffafa;  /* snow */
+}
+
+body {
+    background-color: var(--main-bg-dim);
+    font-family: "Roboto", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+}
+
+main {
+    background-color: var(--body-bg-dim);
+    border-radius: 10px;
+    width: 95%;
+    margin: auto;
+    padding: 1em;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    font-size: 80%;
+    border-top: gray dot-dash 1px;
+}
+
+#img-banner {
+    width: 95%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#not-logged {
+    margin: auto;
+    width: 80%;
+}
+
+#not-logged-buttons {
+    margin: auto;
+    width: 80%;
+}
+
+#login-button {
+    width: 40%;
+    max-width: 8em;
+}
+
+#signup-button {
+    width: 40%;
+    max-width: 8em;
+}
