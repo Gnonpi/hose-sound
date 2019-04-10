@@ -114,19 +114,25 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Europe/Madrid'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -140,7 +146,7 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = '/tmp'
 
-LOGIN_URL = 'home'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'h:home'
 LOGOUT_REDIRECT_URL = 'home'
 
@@ -154,3 +160,14 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',
     message_constants.ERROR: 'alert-danger',
 }
+
+# WEBPACK_LOADER = {
+#     'DEFAULT': {
+#         'CACHE': not DEBUG,
+#         'BUNDLE_DIR_NAME': '',
+#         'STATS_FILE': os.path.join(FRONT_END_PATH, 'dist', 'webpack-stats.json'),
+#         'POLL_INTERVAL': 0.1,
+#         'TIMEOUT': None,
+#         'IGNORE': ['.+\.hot-update.js', '.+\.map']
+#     }
+# }

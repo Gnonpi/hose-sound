@@ -13,17 +13,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
+from hose import views
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
-    path('legal/', TemplateView.as_view(template_name='legals.html'), name='legals'),
+    # path('legal/', TemplateView.as_view(template_name='legals.html'), name='legal'),
+    path('legals/', views.legals, name='legals'),
     path('admin/', admin.site.urls),
     path('api-auth', include('rest_framework.urls')),
     path('user/', include('hose_usage.urls')),
-    path('user/', include('django.contrib.auth.urls'))
+    # path('/', include('django.contrib.auth.urls')),
+    url(r'^auth/api-token-auth/', obtain_jwt_token),
+    url(r'^auth/api-token-refresh/', refresh_jwt_token),
 ]

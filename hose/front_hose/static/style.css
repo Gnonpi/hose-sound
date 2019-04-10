@@ -16,6 +16,11 @@ main {
     padding: 1em;
 }
 
+header {
+  background-color: white;
+  width: 100%;
+}
+
 footer {
     position: fixed;
     left: 0;
@@ -31,24 +36,4 @@ footer {
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-#not-logged {
-    margin: auto;
-    width: 80%;
-}
-
-#not-logged-buttons {
-    margin: auto;
-    width: 80%;
-}
-
-#login-button {
-    width: 40%;
-    max-width: 8em;
-}
-
-#signup-button {
-    width: 40%;
-    max-width: 8em;
 }
