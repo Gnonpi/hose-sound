@@ -34,7 +34,7 @@
 <script>
 import axios from 'axios'
 
-const urlBackend = 'http://127.0.0.1:8000'
+const urlBackend = 'http://localhost:8000'
 
 export default {
   name: 'HomePage',
@@ -53,26 +53,8 @@ export default {
       axios.post(urlBackend + '/auth/api-token-auth/', payload)
         .then(response => {
           let jwtToken = response.data.token
-          const base = {
-            baseUrl: urlBackend,
-            headers: {
-              Authorization: `JWT ${jwtToken}`,
-              'Content-Type': 'application/json'
-            },
-            xhrFields: {
-              withCredentials: true
-            }
-          }
-          const axiosInstance = axios.create(base)
-          axiosInstance({
-            url: '/user/',
-            method: 'get',
-            params: {}
-          })
-            .then((response) => {
-              let authUser = response.data
-              console.log(`authUser: ${authUser}`)
-            })
+          console.log(jwtToken)
+          this.$router.push('/u')
         })
         .catch(error => {
           console.log(error)

@@ -8,12 +8,12 @@ app_name = 'h'
 urlpatterns = [
     ## User objects
     path('home/', login_required(views.HomeView.as_view()), name='home'),
+    path('signup/', views.SignUp.as_view(), name='signup'),
     path('demands/', login_required(views.see_hose_demands), name='see_demands'),
     path('hoses/', login_required(views.LinkedHosesView.as_view()), name='see_hoses'),
-    path('signup/', views.SignUp.as_view(), name='signup'),
 
     ## Browse objects
-    path('browse-hosers/', login_required(views.browser_hosers), name='browse_hosers'),
+    path('browse-hosers/', login_required(views.browse_hosers), name='browse_hosers'),
     # path('browse-content/', views., name='browse_content'),
 
     ## Show object detail

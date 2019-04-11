@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-
+import datetime
 import os
 from django.contrib.messages import constants as message_constants
 
@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'hose_usage.apps.HoseUsageConfig',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,11 +149,6 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = '/tmp'
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'h:home'
-LOGOUT_REDIRECT_URL = 'home'
-
-
 AUTH_USER_MODEL = 'hose_usage.HoseUser'
 WSGI_APPLICATION = 'hose.wsgi.application'
 MESSAGE_TAGS = {
@@ -161,13 +159,18 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'alert-danger',
 }
 
-# WEBPACK_LOADER = {
-#     'DEFAULT': {
-#         'CACHE': not DEBUG,
-#         'BUNDLE_DIR_NAME': '',
-#         'STATS_FILE': os.path.join(FRONT_END_PATH, 'dist', 'webpack-stats.json'),
-#         'POLL_INTERVAL': 0.1,
-#         'TIMEOUT': None,
-#         'IGNORE': ['.+\.hot-update.js', '.+\.map']
-#     }
-# }
+JWT_AUTH = {
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    # TODO - set this properly for production
+    'http://127.0.0.1:8080',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://localhost:8080',
+)

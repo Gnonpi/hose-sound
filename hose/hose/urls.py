@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 from hose import views
 
@@ -32,4 +32,5 @@ urlpatterns = [
     # path('/', include('django.contrib.auth.urls')),
     url(r'^auth/api-token-auth/', obtain_jwt_token),
     url(r'^auth/api-token-refresh/', refresh_jwt_token),
+    url(r'^auth/api-token-verify/', verify_jwt_token),
 ]

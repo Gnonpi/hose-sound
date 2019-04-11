@@ -60,7 +60,7 @@ class LinkedHosesView(generic.ListView):
         return results
 
 
-def browser_hosers(request):
+def browse_hosers(request):
     """Render a portion of HoseUser"""
     user_id = request.user.id
     max_hosers = 20
