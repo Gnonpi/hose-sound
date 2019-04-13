@@ -27,9 +27,10 @@ urlpatterns = [
     # path('legal/', TemplateView.as_view(template_name='legals.html'), name='legal'),
     path('legals/', views.legals, name='legals'),
     path('admin/', admin.site.urls),
-    path('api-auth', include('rest_framework.urls')),
+
     path('user/', include('hose_usage.urls')),
-    # path('/', include('django.contrib.auth.urls')),
+
+    path('api-auth', include('rest_framework.urls')),
     url(r'^auth/api-token-auth/', obtain_jwt_token),
     url(r'^auth/api-token-refresh/', refresh_jwt_token),
     url(r'^auth/api-token-verify/', verify_jwt_token),

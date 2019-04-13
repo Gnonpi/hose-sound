@@ -1,21 +1,73 @@
 <template>
-  <div>
-    User home page: {{ username }}
-  </div>
+  <main>
+    Logged as: {{ loggedUsername }}
+    <h1>User: {{ username }}</h1>
+    <div id="displayed-hoses">
+      <div v-for="(hose, index) in accessibleHoses" :key="index">
+        <b-card>
+          <b-row>
+            <b-col md="4">
+              <router-link to="/h">
+                <h3>{{ hose.hose_name }}</h3>
+              </router-link>
+            </b-col>
+            with
+            <b-col md="6">
+              <router-link :to="{name: 'UserHomePage', params: {username: hose.username, userId: hose.userId}}">
+                <h2>{{ hose.username }}</h2>
+              </router-link>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col md="4">
+              <router-link to="/h">
+                <b-img thumbnail type="image/png" id="'img-hose-' + hose.id" src="/static/favicon.ico"></b-img>
+              </router-link>
+            </b-col>
+            <b-col md="6">
+              {{ hose.accessible_contents.length }} song{{ hose.accessible_contents.length > 1 ? 's':'' }}
+            </b-col>
+          </b-row>
+          <!--{{ hose }}-->
+        </b-card>
+      </div>
+    </div>
+  </main>
 </template>
 
 <script>
+/*
+{
+  "id": 2,
+  "hose_name": "lo",
+  "time_created": "2019-01-13",
+  "time_last_update": "2019-01-13T23:51:14.246479+01:00",
+  "accessible_contents": [{
+    "id": 3,
+    "hose_from": 2,
+    "uploader": null,
+    "name": "Laink",
+    "time_added": "2019-01-19T01:23:17.326282+01:00",
+    "times_listened": 1
+  }],
+  "userId": 1,
+  "username": "denis"
+}
+*/
 import axios from 'axios'
 
 export default {
   name: 'UserHomePage',
   data: function () {
     return {
-      username: ''
+      loggedUsername: '',
+      username: '',
+      accessibleHoses: []
     }
   },
   methods: {
-    getUserInfo: function () {
+    getUserInfo: function (userId) {
+      console.log(`getUserInfo: ${userId}`)
       const base = {
         baseURL: this.$store.state.endpoints.baseUrl,
         headers: {
@@ -27,25 +79,40 @@ export default {
         }
       }
       const axiosInstance = axios.create(base)
-      const userIdUrl = this.$store.state.endpoints.baseUrl + '/user/rest/hoser/' + this.$store.state.authUser.id
-      axiosInstance.get(userIdUrl, {
-      })
+      const userIdUrl = this.$store.state.endpoints.restHoser + userId
+      axiosInstance.get(userIdUrl, {})
         .then(response => {
           this.username = response.data.username
+          response.data.accessible_hoses.forEach(hose => {
+            this.accessibleHoses.push(this.formatHose(hose))
+          })
         })
         .catch(error => {
           console.debug('Error')
           console.debug(error)
           console.debug(JSON.stringify(error, null, 2))
         })
+    },
+    formatHose: function (hose) {
+      let otherUser = {userId: hose.second_end, username: hose.second_end_username}
+      if (this.username === hose.second_end_username) {
+        otherUser = {userId: hose.first_end, username: hose.first_end_username}
+      }
+      delete hose.first_end
+      delete hose.first_end_username
+      delete hose.second_end
+      delete hose.second_end_username
+      hose = Object.assign(hose, otherUser)
+      return hose
     }
   },
   mounted: function () {
     let returnLogin = true
     if ('authUser' in this.$store.state) {
-      console.debug(this.$store.state.authUser)
       if (this.$store.state.isAuthenticated) {
-        this.getUserInfo()
+        this.loggedUsername = this.$store.state.authUser.username
+        let userId = this.$route.params.userId
+        this.getUserInfo(userId)
         returnLogin = false
       } else {
         console.debug('user not auth')
@@ -57,6 +124,15 @@ export default {
       console.log('Going back to login')
       this.$router.push({name: 'HomePage'})
     }
+  },
+  beforeRouteUpdate (to, from, next) {
+    // react to route changes...
+    // don't forget to call next()
+    this.username = ''
+    this.accessibleHoses = []
+    let userId = to.params.userId
+    this.getUserInfo(userId)
+    next()
   }
 }
 </script>

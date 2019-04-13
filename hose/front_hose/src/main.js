@@ -2,13 +2,23 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueAxios from 'vue-axios'
 import App from './App'
 import router from './router'
+
+import VueAxios from 'vue-axios'
 import axios from 'axios'
+
+// eslint-disable-next-line
+import jwt_decode from 'jwt-decode'
+
+import BootstrapVue from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
+
+Vue.use(BootstrapVue)
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -22,14 +32,13 @@ const store = new Vuex.Store({
     endpoints: {
       baseUrl: urlBackend,
       obtainJWT: urlBackend + '/auth/api-token-auth/',
-      refreshJWT: urlBackend + '/auth//auth/api-token-refresh/'
+      refreshJWT: urlBackend + '/auth/auth/api-token-refresh/',
+      restHoser: urlBackend + '/user/rest/hoser/',
+      signup: urlBackend + '/signup'
     }
   },
   mutations: {
-    setAuthUser (state, {
-      authUser,
-      isAuthenticated
-    }) {
+    setAuthUser (state, {authUser, isAuthenticated}) {
       Vue.set(state, 'authUser', authUser)
       Vue.set(state, 'isAuthenticated', isAuthenticated)
     },
@@ -68,6 +77,23 @@ const store = new Vuex.Store({
         .catch(error => {
           console.log(error)
         })
+    },
+    inspectToken () {
+      const token = this.state.jwt
+      if (token) {
+        const decoded = jwt_decode(token)
+        const exp = decoded.exp
+        const origIat = decoded.orig_iat
+
+        if (exp - (Date.now() / 1000) < 1800 && (Date.now() / 1000) - origIat < 628200) {
+          this.dispatch('refreshToken')
+        } else if (exp - (Date.now() / 1000) < 1800) {
+          // DO NOTHING, DO NOT REFRESH
+        } else {
+          // PROMPT USER TO RE-LOGIN, THIS ELSE CLAUSE COVERS THE CONDITION WHERE A TOKEN IS EXPIRED AS WELL
+          router.push({name: 'HomePage'})
+        }
+      }
     }
   }
 })

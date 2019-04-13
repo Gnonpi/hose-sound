@@ -17,9 +17,13 @@ export default new Router({
       name: 'LegalsPage',
       component: LegalsPage
     }, {
-      path: '/u',
+      path: '/u/:username',
       name: 'UserHomePage',
       component: UserHomePage
+    }, {
+      path: '/h',
+      name: 'HoseViewPage',
+      component: HomePage
     }
   ]
 })

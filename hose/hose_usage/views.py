@@ -2,14 +2,14 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import generic
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer, HoseContentSerializer
-from hose_usage.forms import CustomUserCreationForm, UploadSongForm
+from hose_usage.forms import UploadSongForm
 from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 import hose_usage.permissions as hose_permissions
 
@@ -232,11 +232,13 @@ def upload_song(request, hose_id):
             return HttpResponse('Upload is ok.')
 
 
-class SignUp(generic.CreateView):
-    """Signup view"""
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')
-    template_name = 'signup.html'
+class HoseCur(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user = request.user
+        serialized = HoseUserSerializer(user)
+        return Response(serialized.data)
 
 
 ## REST views

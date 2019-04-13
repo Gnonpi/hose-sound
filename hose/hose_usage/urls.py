@@ -8,7 +8,6 @@ app_name = 'h'
 urlpatterns = [
     ## User objects
     path('home/', login_required(views.HomeView.as_view()), name='home'),
-    path('signup/', views.SignUp.as_view(), name='signup'),
     path('demands/', login_required(views.see_hose_demands), name='see_demands'),
     path('hoses/', login_required(views.LinkedHosesView.as_view()), name='see_hoses'),
 
@@ -26,6 +25,8 @@ urlpatterns = [
     path('hoser/<int:hoser_id>/cancel', login_required(views.cancel_hose_creation), name='hoser_cancel'),
     # path('hose/<int:hose-pk>/<int:content-pk>', views., name='show_content'),
     path('hose/<int:hose_id>/upload', login_required(views.upload_song), name='upload_song'),
+
+    path('cur', views.HoseCur.as_view(), name='current_hoser'),
 
     ## REST url
     path('rest/hosers', views.HoseUserList.as_view(), name='rest_hose_users_list'),
