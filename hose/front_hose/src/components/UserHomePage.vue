@@ -1,6 +1,6 @@
 <template>
   <main>
-    Logged as: {{ loggedUsername }}
+    <UpNavBarComp></UpNavBarComp>
     <h1>User: {{ username }}</h1>
     <div id="displayed-hoses">
       <div v-for="(hose, index) in accessibleHoses" :key="index">
@@ -54,10 +54,12 @@
   "username": "denis"
 }
 */
+import UpNavBarComp from './UpNavBarComp.vue'
 import axios from 'axios'
 
 export default {
   name: 'UserHomePage',
+  components: {UpNavBarComp},
   data: function () {
     return {
       loggedUsername: '',

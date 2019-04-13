@@ -15,6 +15,13 @@ import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+import Unicon from 'vue-unicons'
+// https://antonreshetov.github.io/vue-unicons/
+import { uniSignOutAlt } from 'vue-unicons/src/icons'
+
+Unicon.add([uniSignOutAlt])
+Vue.use(Unicon)
+
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
 

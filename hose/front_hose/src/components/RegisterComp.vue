@@ -34,7 +34,7 @@
           maxLength="150"
         ></b-form-input>
       </b-form-group>
-      <b-form-group label="Repear password" label-for="in-password2" id="in-password2-group"
+      <b-form-group label="Repeat password" label-for="in-password2" id="in-password2-group"
                     description="Just to be sure">
         <b-form-input
           id="in-password2"
