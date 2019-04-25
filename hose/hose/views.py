@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -5,6 +7,8 @@ from rest_framework.response import Response
 
 from hose_usage.models import HoseUser
 from hose_usage.serializers import HoseUserSerializer
+
+logger = logging.getLogger('django')
 
 
 def legals(request):
@@ -14,8 +18,8 @@ def legals(request):
         return JsonResponse({'message': 'Error getting legal text'}, status=401)
 
 
-@api_view(['POST'])
 def signup(request):
+    logger.debug('Hit the signup')
     username = request.body.json['username']
     if HoseUser.objects.filter(username=username).any():
         return Response({'error': 'Username already used'}, status=status.HTTP_409_CONFLICT)

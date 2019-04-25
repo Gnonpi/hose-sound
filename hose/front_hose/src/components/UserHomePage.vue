@@ -5,30 +5,29 @@
     <div id="displayed-hoses">
       <div v-for="(hose, index) in accessibleHoses" :key="index">
         <b-card>
-          <b-row>
-            <b-col md="4">
-              <router-link to="/h">
-                <h3>{{ hose.hose_name }}</h3>
-              </router-link>
-            </b-col>
-            with
-            <b-col md="6">
-              <router-link :to="{name: 'UserHomePage', params: {username: hose.username, userId: hose.userId}}">
-                <h2>{{ hose.username }}</h2>
-              </router-link>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col md="4">
-              <router-link to="/h">
-                <b-img thumbnail type="image/png" id="'img-hose-' + hose.id" src="/static/favicon.ico"></b-img>
-              </router-link>
-            </b-col>
-            <b-col md="6">
-              {{ hose.accessible_contents.length }} song{{ hose.accessible_contents.length > 1 ? 's':'' }}
-            </b-col>
-          </b-row>
-          <!--{{ hose }}-->
+          <h6 slot="header" class="mb-0">
+            Hose
+            <router-link to="/h">{{ hose.hose_name }}</router-link>
+          </h6>
+          <b-card-text>
+            <b-row>
+              <b-col md="4">
+                <router-link to="/h">
+                  <b-img thumbnail type="image/png" id="'img-hose-' + hose.id" src="/static/favicon.ico"></b-img>
+                </router-link>
+              </b-col>
+              <b-col md="5">
+                With
+                <router-link :to="{name: 'UserHomePage', params: {username: hose.username, userId: hose.userId}}">
+                  <h5><b>{{ hose.username }}</b></h5>
+                </router-link>
+              </b-col>
+              <b-col md="1">
+                Contains {{ hose.accessible_contents.length }} song{{ hose.accessible_contents.length > 1 ? 's':'' }}
+              </b-col>
+            </b-row>
+          </b-card-text>
+          <em slot="footer">Last update {{ hose.time_last_update }}</em>
         </b-card>
       </div>
     </div>

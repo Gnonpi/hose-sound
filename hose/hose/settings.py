@@ -91,11 +91,11 @@ with open(str(path_env), 'r') as f_env:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': env['HOST'],
-        'PORT': env['PORT'],
-        'USER': env['USER'],
-        'NAME': env['NAME'],
-        'PASSWORD': env['PASSWORD']
+        'HOST': env['DB_HOST'],
+        'PORT': env['DB_PORT'],
+        'USER': env['DB_USER'],
+        'NAME': env['DB_NAME'],
+        'PASSWORD': env['DB_PASSWORD']
     }
 }
 
@@ -166,11 +166,15 @@ JWT_AUTH = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    # TODO - set this properly for production
-    'http://127.0.0.1:8080',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'http://localhost:8080',
-)
+CORS_ALLOW_CREDENTIALS = False
+CORS_ORIGIN_WHITELIST = tuple()
+if env['APP_ENV'] == 'dev':
+    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = (
+        # TODO - set this properly for production
+        'http://127.0.0.1:8080',
+        'http://127.0.0.1:8000',
+        'http://localhost:8000',
+        'http://localhost:8080',
+    )

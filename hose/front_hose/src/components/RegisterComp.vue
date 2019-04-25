@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="register-comp">
     <h3>Register</h3>
     <b-alert v-if="showAlert" show variant="danger">
       {{ alertMessage }}
@@ -47,6 +47,7 @@
       </b-form-group>
       <b-button
           @click.prevent="register"
+          id="b-register"
           variant="primary"
           type="submit">
           Register

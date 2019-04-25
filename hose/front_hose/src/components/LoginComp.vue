@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div id="login-comp">
       <h3>Login</h3>
       <b-alert v-if="showAlert" show variant="danger">
         {{ alertMessage }}
       </b-alert>
-      <b-form class="login-form">
+      <b-form id="login-form">
         <b-form-group label="Username" label-for="in-username" id="in-username-group">
           <b-form-input
             id="in-username"
@@ -25,6 +25,7 @@
         </b-form-group>
         <b-button
           @click.prevent="authenticate"
+          id="b-login"
           variant="primary"
           type="submit">
           Log In

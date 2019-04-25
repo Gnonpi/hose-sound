@@ -31,6 +31,7 @@ urlpatterns = [
     path('user/', include('hose_usage.urls')),
 
     path('api-auth', include('rest_framework.urls')),
+    path('signup/', views.signup, name='signup'),
     url(r'^auth/api-token-auth/', obtain_jwt_token),
     url(r'^auth/api-token-refresh/', refresh_jwt_token),
     url(r'^auth/api-token-verify/', verify_jwt_token),

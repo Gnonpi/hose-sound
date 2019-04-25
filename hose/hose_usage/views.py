@@ -306,6 +306,7 @@ class HoseAssociationDetail(APIView):
             return Response(serialized.data, status=status.HTTP_201_CREATED)
         return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
 
+
 class HoseContentList(APIView):
     permission_classes = (permissions.IsAuthenticated, hose_permissions.IsOwnerOf,)
 

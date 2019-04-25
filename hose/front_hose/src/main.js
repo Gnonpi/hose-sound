@@ -17,9 +17,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import Unicon from 'vue-unicons'
 // https://antonreshetov.github.io/vue-unicons/
-import { uniSignOutAlt } from 'vue-unicons/src/icons'
+import { uniSignOutAlt, uniSlidersV } from 'vue-unicons/src/icons'
 
-Unicon.add([uniSignOutAlt])
+Unicon.add([uniSignOutAlt, uniSlidersV])
 Vue.use(Unicon)
 
 Vue.use(Vuex)
@@ -41,13 +41,19 @@ const store = new Vuex.Store({
       obtainJWT: urlBackend + '/auth/api-token-auth/',
       refreshJWT: urlBackend + '/auth/auth/api-token-refresh/',
       restHoser: urlBackend + '/user/rest/hoser/',
-      signup: urlBackend + '/signup'
+      signup: urlBackend + '/signup/'
     }
   },
   mutations: {
     setAuthUser (state, {authUser, isAuthenticated}) {
       Vue.set(state, 'authUser', authUser)
       Vue.set(state, 'isAuthenticated', isAuthenticated)
+    },
+    logoutUser (state) {
+      localStorage.removeItem('t')
+      state.jwt = null
+      Vue.delete(state, 'authUser')
+      Vue.delete(state, 'isAuthenticated')
     },
     updateToken (state, newToken) {
       localStorage.setItem('t', newToken)
