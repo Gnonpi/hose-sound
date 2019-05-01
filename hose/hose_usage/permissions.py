@@ -5,6 +5,7 @@ from hose_usage.models import HoseAssociation, HoseContent
 
 class IsOwnerOf(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        print(f'IsOwnerOf: {type(obj)}')
         if isinstance(obj, HoseAssociation):
             if obj.first_end == request.user or obj.second_end == request.user:
                 return True

@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, Http404
@@ -238,7 +240,11 @@ class HoseCur(APIView):
     def get(self, request, format=None):
         user = request.user
         serialized = HoseUserSerializer(user)
-        return Response(serialized.data)
+        trunc_serialized = {
+            'id': int(serialized['id'].value),
+            'username': str(serialized['username'].value)
+        }
+        return Response(trunc_serialized)
 
 
 ## REST views
@@ -310,10 +316,28 @@ class HoseAssociationDetail(APIView):
 class HoseContentList(APIView):
     permission_classes = (permissions.IsAuthenticated, hose_permissions.IsOwnerOf,)
 
-    def get(self, request, format=None):
-        accessible_hose = HoseAssociation.objects.filter(
-            Q(first_end=request.user) | Q(second_end=request.user)
-        )
-        contents = HoseContent.objects.filter(hose_from__in=accessible_hose).all()
+    # def get(self, request, format=None):
+    #     accessible_hose = HoseAssociation.objects.filter(
+    #         Q(first_end=request.user) | Q(second_end=request.user)
+    #     )
+    #     contents = HoseContent.objects.filter(hose_from__in=accessible_hose).all()
+    #     contents_serialized = HoseContentSerializer(contents, many=True)
+    #     return Response(contents_serialized.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        json_payload = json.loads(request.body)
+        other_user_id = json_payload.get('other_user_id')
+        hose_id = json_payload.get('hose_id')
+        other_user = HoseUser.objects.filter(id=other_user_id).first()
+        if other_user is None:
+            return Response({'error': f'Could not find any user {other_user_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        accessible_hose = HoseAssociation.objects.filter(id=hose_id).first()
+        if accessible_hose is None:
+            return Response({'error': f'Could not find any hose for {hose_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        user_fitting = accessible_hose.is_users_fitting(request.user, other_user)
+        if not user_fitting:
+            return Response({'error': f'Users could not fit into Hose#{hose_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        contents = HoseContent.objects.filter(hose_from=accessible_hose).all()
         contents_serialized = HoseContentSerializer(contents, many=True)
         return Response(contents_serialized.data, status=status.HTTP_200_OK)
+

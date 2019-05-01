@@ -55,6 +55,21 @@ class HoseAssociation(models.Model):
             # todo: add custom error
             # raise ValueError(f"Username '{name}' is not in Hose {self.hose_name}")
 
+    def is_users_fitting(self, userA, userB):
+        """
+        Check that userA and userB are the two ends of the hose
+        :param userA:
+        :param userB:
+        :return:
+        """
+        if userA.id == self.first_end.id:
+            if userB.id == self.second_end.id:
+                return True
+        elif userA.id == self.second_end.id:
+            if userB.id == self.first_end.id:
+                return True
+        return False
+
     def is_valid_association(self):
         """
         Check if association is a cycle
