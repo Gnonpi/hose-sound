@@ -83,7 +83,6 @@ export default {
         })
         .catch(error => {
           console.debug('Error')
-          console.debug(error)
           console.debug(JSON.stringify(error, null, 2))
         })
     },
@@ -106,6 +105,7 @@ export default {
       this.loggedUsername = this.$store.state.authUser.username
       let userId = this.$route.params.userId
       if (typeof userId === 'undefined') {
+        console.log('No userId defined, going back to own user page')
         userId = this.$store.state.authUser.id
       }
       this.getUserInfo(userId)
@@ -119,6 +119,10 @@ export default {
     const returnLogin = shared.verifyIsLogged(this)
     if (returnLogin === false) {
       let userId = to.params.userId
+      if (typeof userId === 'undefined') {
+        console.log('No userId defined, going back to own user page')
+        userId = this.$store.state.authUser.id
+      }
       this.getUserInfo(userId)
     }
     next()
