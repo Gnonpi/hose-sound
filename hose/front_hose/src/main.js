@@ -7,6 +7,7 @@ import router from './router'
 
 import VueAxios from 'vue-axios'
 import axios from 'axios'
+import VueCookie from 'vue-cookie'
 
 // eslint-disable-next-line
 import jwt_decode from 'jwt-decode'
@@ -17,13 +18,15 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import Unicon from 'vue-unicons'
 // https://antonreshetov.github.io/vue-unicons/
-import { uniSignOutAlt, uniSlidersV } from 'vue-unicons/src/icons'
+import { uniSignOutAlt, uniSlidersV, uniPlayCircle } from 'vue-unicons/src/icons'
 
-Unicon.add([uniSignOutAlt, uniSlidersV])
+Unicon.add([uniSignOutAlt, uniSlidersV, uniPlayCircle])
 Vue.use(Unicon)
 
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
+
+Vue.use(VueCookie)
 
 Vue.use(BootstrapVue)
 
@@ -40,7 +43,10 @@ const store = new Vuex.Store({
       baseUrl: urlBackend,
       obtainJWT: urlBackend + '/auth/api-token-auth/',
       refreshJWT: urlBackend + '/auth/auth/api-token-refresh/',
+      currentHoser: urlBackend + '/user/cur',
       restHoser: urlBackend + '/user/rest/hoser/',
+      restHose: urlBackend + '/user/rest/hose/',
+      restSongs: urlBackend + '/user/rest/songs',
       signup: urlBackend + '/signup/'
     }
   },
@@ -54,6 +60,8 @@ const store = new Vuex.Store({
       state.jwt = null
       Vue.delete(state, 'authUser')
       Vue.delete(state, 'isAuthenticated')
+      Vue.delete(state, 'currentUser.userId')
+      Vue.delete(state, 'currentUser.username')
     },
     updateToken (state, newToken) {
       localStorage.setItem('t', newToken)
@@ -104,7 +112,7 @@ const store = new Vuex.Store({
           // DO NOTHING, DO NOT REFRESH
         } else {
           // PROMPT USER TO RE-LOGIN, THIS ELSE CLAUSE COVERS THE CONDITION WHERE A TOKEN IS EXPIRED AS WELL
-          router.push({name: 'HomePage'})
+          router.replace({name: 'HomePage'})
         }
       }
     }

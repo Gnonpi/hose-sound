@@ -4,7 +4,17 @@
       <img src="/static/favicon.ico" class="d-inline-block align-top" alt="logo">
     </b-navbar-brand>
     <b-navbar-brand>
-      <h2>{{ loggedUsername }}</h2>
+      <h2>
+        <router-link id="link-back-user"
+                     :to="{
+          name: 'UserHomePage',
+          params: {
+            username: loggedUsername,
+            userId: loggedUserId}
+          }">
+          {{ loggedUsername }}
+        </router-link>
+      </h2>
     </b-navbar-brand>
     <b-navbar-nav class="ml-auto">
       <b-button>
@@ -23,7 +33,8 @@ export default {
   name: 'UpNavBarComp',
   data: function () {
     return {
-      loggedUsername: ''
+      loggedUsername: '',
+      loggedUserId: ''
     }
   },
   methods: {
@@ -38,6 +49,7 @@ export default {
     if ('authUser' in this.$store.state) {
       if (this.$store.state.isAuthenticated) {
         this.loggedUsername = this.$store.state.authUser.username
+        this.loggedUserId = this.$store.state.authUser.userId
         returnLogin = false
       } else {
         console.debug('user not auth')

@@ -58,8 +58,6 @@
 
 <script>
 import axios from 'axios'
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 export default {
   name: 'RegisterComp',
@@ -84,11 +82,15 @@ export default {
     },
     register: function () {
       if (this.checkPasswordsEqual()) {
-        axios.post(this.$store.state.endpoints.signup, {
+        const payload = {
           email: this.registerEmail,
           username: this.registerUsername,
           password: this.registerPassword1
-        })
+        }
+        const headers = {
+          'X-CSRFToken': this.$cookie('csrftoken')
+        }
+        axios.post(this.$store.state.endpoints.signup, payload, headers)
           .then(response => {
             console.log(response.data)
           })

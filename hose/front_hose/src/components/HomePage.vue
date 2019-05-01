@@ -24,9 +24,9 @@
     </div>
 
     <main>
-      <LoginComp></LoginComp>
-      <hr>
       <RegisterComp></RegisterComp>
+      <hr>
+      <LoginComp></LoginComp>
     </main>
   </div>
 </template>

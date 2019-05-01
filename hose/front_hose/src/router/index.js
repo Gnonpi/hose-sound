@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HomePage from '@/components/HomePage'
 import LegalsPage from '@/components/LegalsPage'
 import UserHomePage from '@/components/UserHomePage'
+import HoseViewPage from '@/components/HoseViewPage'
 
 Vue.use(Router)
 
@@ -21,9 +22,9 @@ export default new Router({
       name: 'UserHomePage',
       component: UserHomePage
     }, {
-      path: '/h',
+      path: '/h/:hoseid',
       name: 'HoseViewPage',
-      component: HomePage
+      component: HoseViewPage
     }
   ]
 })

@@ -53,6 +53,9 @@ export default {
         username: this.username,
         password: this.password
       }
+      // const headers = {
+      //   withCredentials: true
+      // }
       axios.post(this.$store.state.endpoints.obtainJWT, payload)
         .then(response => {
           this.$store.commit('updateToken', response.data.token)

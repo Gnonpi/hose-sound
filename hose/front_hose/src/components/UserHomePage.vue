@@ -4,10 +4,15 @@
     <h1>User: {{ username }}</h1>
     <div id="displayed-hoses">
       <div v-for="(hose, index) in accessibleHoses" :key="index">
-        <b-card>
+        <b-card :id="'hose-card-' + index">
           <h6 slot="header" class="mb-0">
             Hose
-            <router-link to="/h">{{ hose.hose_name }}</router-link>
+            <router-link :to="{
+              name: 'HoseViewPage',
+              params: {
+                hoseid: hose.id}
+               }">{{ hose.hose_name }}
+            </router-link>
           </h6>
           <b-card-text>
             <b-row>
@@ -18,41 +23,30 @@
               </b-col>
               <b-col md="5">
                 With
-                <router-link :to="{name: 'UserHomePage', params: {username: hose.username, userId: hose.userId}}">
+                <router-link :to="{
+                  name: 'UserHomePage',
+                  params: {
+                    username: hose.username,
+                    userId: hose.userId}
+                   }">
                   <h5><b>{{ hose.username }}</b></h5>
                 </router-link>
               </b-col>
               <b-col md="1">
-                Contains {{ hose.accessible_contents.length }} song{{ hose.accessible_contents.length > 1 ? 's':'' }}
+                Contains {{ hose.number_of_songs }} song{{ hose.number_of_songs > 1 ? 's':'' }}
               </b-col>
             </b-row>
           </b-card-text>
           <em slot="footer">Last update {{ hose.time_last_update }}</em>
         </b-card>
+        <hr>
       </div>
     </div>
   </main>
 </template>
 
 <script>
-/*
-{
-  "id": 2,
-  "hose_name": "lo",
-  "time_created": "2019-01-13",
-  "time_last_update": "2019-01-13T23:51:14.246479+01:00",
-  "accessible_contents": [{
-    "id": 3,
-    "hose_from": 2,
-    "uploader": null,
-    "name": "Laink",
-    "time_added": "2019-01-19T01:23:17.326282+01:00",
-    "times_listened": 1
-  }],
-  "userId": 1,
-  "username": "denis"
-}
-*/
+import shared from '../shared.js'
 import UpNavBarComp from './UpNavBarComp.vue'
 import axios from 'axios'
 
@@ -68,7 +62,6 @@ export default {
   },
   methods: {
     getUserInfo: function (userId) {
-      console.log(`getUserInfo: ${userId}`)
       const base = {
         baseURL: this.$store.state.endpoints.baseUrl,
         headers: {
@@ -108,22 +101,14 @@ export default {
     }
   },
   mounted: function () {
-    let returnLogin = true
-    if ('authUser' in this.$store.state) {
-      if (this.$store.state.isAuthenticated) {
-        this.loggedUsername = this.$store.state.authUser.username
-        let userId = this.$route.params.userId
-        this.getUserInfo(userId)
-        returnLogin = false
-      } else {
-        console.debug('user not auth')
+    const returnLogin = shared.verifyIsLogged(this)
+    if (returnLogin === false) {
+      this.loggedUsername = this.$store.state.authUser.username
+      let userId = this.$route.params.userId
+      if (typeof userId === 'undefined') {
+        userId = this.$store.state.authUser.id
       }
-    } else {
-      console.debug('authUser not in state')
-    }
-    if (returnLogin) {
-      console.log('Going back to login')
-      this.$router.push({name: 'HomePage'})
+      this.getUserInfo(userId)
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -131,8 +116,11 @@ export default {
     // don't forget to call next()
     this.username = ''
     this.accessibleHoses = []
-    let userId = to.params.userId
-    this.getUserInfo(userId)
+    const returnLogin = shared.verifyIsLogged(this)
+    if (returnLogin === false) {
+      let userId = to.params.userId
+      this.getUserInfo(userId)
+    }
     next()
   }
 }

@@ -110,12 +110,22 @@ module.exports = {
     browser
       .url(devServer)
       .waitForElementVisible('#register-comp', 5000)
-      .setValue('input[id=in-email]', testEmail)
-      .setValue('input[id=in-username]', testUsername)
-      .setValue('input[id=in-password1]', testPassword)
-      .setValue('input[id=in-password2]', testPassword)
+      .setValue('#register-comp input[id=in-email]', testEmail)
+      .setValue('#register-comp input[id=in-username]', testUsername)
+      .setValue('#register-comp input[id=in-password1]', testPassword)
+      .setValue('#register-comp input[id=in-password2]', testPassword)
       .click('button[id=b-register]')
       .pause(1000)
+    browser.getLog('browser', function(logEntriesArray) {
+  if (logEntriesArray.length) {
+    console.log('Log length: ' + logEntriesArray.length);
+    logEntriesArray.forEach(function(log) {
+      console.log(
+        '[' + log.level + '] ' + log.timestamp + ' : ' + log.message
+      );
+    });
+  }
+})
     browser
       .assert.urlContains('/u/' + testUsername)
       .end()
