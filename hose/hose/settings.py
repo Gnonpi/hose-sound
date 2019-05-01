@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-
+import datetime
 import os
 from django.contrib.messages import constants as message_constants
 
@@ -33,6 +33,9 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'hose_usage.apps.HoseUsageConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -87,11 +91,11 @@ with open(str(path_env), 'r') as f_env:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': env['HOST'],
-        'PORT': env['PORT'],
-        'USER': env['USER'],
-        'NAME': env['NAME'],
-        'PASSWORD': env['PASSWORD']
+        'HOST': env['DB_HOST'],
+        'PORT': env['DB_PORT'],
+        'USER': env['DB_USER'],
+        'NAME': env['DB_NAME'],
+        'PASSWORD': env['DB_PASSWORD']
     }
 }
 
@@ -113,19 +117,25 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Europe/Madrid'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -139,11 +149,6 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = '/tmp'
 
-LOGIN_URL = 'home'
-LOGIN_REDIRECT_URL = 'h:home'
-LOGOUT_REDIRECT_URL = 'home'
-
-
 AUTH_USER_MODEL = 'hose_usage.HoseUser'
 WSGI_APPLICATION = 'hose.wsgi.application'
 MESSAGE_TAGS = {
@@ -153,3 +158,23 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'alert-warning',
     message_constants.ERROR: 'alert-danger',
 }
+
+JWT_AUTH = {
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = False
+CORS_ORIGIN_WHITELIST = tuple()
+if env['APP_ENV'] == 'dev':
+    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = (
+        # TODO - set this properly for production
+        'http://127.0.0.1:8080',
+        'http://127.0.0.1:8000',
+        'http://localhost:8000',
+        'http://localhost:8080',
+    )

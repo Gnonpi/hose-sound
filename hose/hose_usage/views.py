@@ -1,12 +1,19 @@
-from django.contrib import messages
-from django.db.models import F, Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
-from django.views import generic
+import json
 
-from .forms import CustomUserCreationForm, UploadSongForm
-from .models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
+from django.contrib import messages
+from django.db.models import Q
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.views import generic
+from rest_framework import status, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer, HoseContentSerializer
+from hose_usage.forms import UploadSongForm
+from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
+import hose_usage.permissions as hose_permissions
 
 
 class HomeView(generic.ListView):
@@ -55,7 +62,7 @@ class LinkedHosesView(generic.ListView):
         return results
 
 
-def browser_hosers(request):
+def browse_hosers(request):
     """Render a portion of HoseUser"""
     user_id = request.user.id
     max_hosers = 20
@@ -227,8 +234,110 @@ def upload_song(request, hose_id):
             return HttpResponse('Upload is ok.')
 
 
-class SignUp(generic.CreateView):
-    """Signup view"""
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')
-    template_name = 'signup.html'
+class HoseCur(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user = request.user
+        serialized = HoseUserSerializer(user)
+        trunc_serialized = {
+            'id': int(serialized['id'].value),
+            'username': str(serialized['username'].value)
+        }
+        return Response(trunc_serialized)
+
+
+## REST views
+class HoseUserList(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get(self, request, format=None):
+        users = HoseUser.objects.all()
+        users_serialized = HoseUserSerializer(users, many=True)
+        return Response(users_serialized.data)
+
+    def post(self, request, format=None):
+        serialized = HoseUserSerializer(data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HoseUserDetail(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get_object(self, pk):
+        user = get_object_or_404(HoseUser, pk=pk)
+        return user
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serialized = HoseUserSerializer(user)
+        return Response(serialized.data)
+
+    def put(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serialized = HoseUserSerializer(user, data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data)
+        return Response(serialized.data, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class HoseAssociationDetail(APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          hose_permissions.IsOwnerOf)
+
+    def get_object(self, pk):
+        hose = get_object_or_404(HoseAssociation, pk=pk)
+        return hose
+
+    def get(self, request, pk, format=None):
+        hose = self.get_object(pk=pk)
+        serialized = HoseAssociationSerializer(hose, context={'request': request})
+        return Response(serialized.data)
+
+    def post(self, request, format=None):
+        serialized = HoseAssociationSerializer(data=request.data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return Response(serialized.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HoseContentList(APIView):
+    permission_classes = (permissions.IsAuthenticated, hose_permissions.IsOwnerOf,)
+
+    # def get(self, request, format=None):
+    #     accessible_hose = HoseAssociation.objects.filter(
+    #         Q(first_end=request.user) | Q(second_end=request.user)
+    #     )
+    #     contents = HoseContent.objects.filter(hose_from__in=accessible_hose).all()
+    #     contents_serialized = HoseContentSerializer(contents, many=True)
+    #     return Response(contents_serialized.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        json_payload = json.loads(request.body)
+        other_user_id = json_payload.get('other_user_id')
+        hose_id = json_payload.get('hose_id')
+        other_user = HoseUser.objects.filter(id=other_user_id).first()
+        if other_user is None:
+            return Response({'error': f'Could not find any user {other_user_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        accessible_hose = HoseAssociation.objects.filter(id=hose_id).first()
+        if accessible_hose is None:
+            return Response({'error': f'Could not find any hose for {hose_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        user_fitting = accessible_hose.is_users_fitting(request.user, other_user)
+        if not user_fitting:
+            return Response({'error': f'Users could not fit into Hose#{hose_id}'}, status=status.HTTP_400_BAD_REQUEST)
+        contents = HoseContent.objects.filter(hose_from=accessible_hose).all()
+        contents_serialized = HoseContentSerializer(contents, many=True)
+        return Response(contents_serialized.data, status=status.HTTP_200_OK)
+

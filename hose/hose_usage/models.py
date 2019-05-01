@@ -55,6 +55,21 @@ class HoseAssociation(models.Model):
             # todo: add custom error
             # raise ValueError(f"Username '{name}' is not in Hose {self.hose_name}")
 
+    def is_users_fitting(self, userA, userB):
+        """
+        Check that userA and userB are the two ends of the hose
+        :param userA:
+        :param userB:
+        :return:
+        """
+        if userA.id == self.first_end.id:
+            if userB.id == self.second_end.id:
+                return True
+        elif userA.id == self.second_end.id:
+            if userB.id == self.first_end.id:
+                return True
+        return False
+
     def is_valid_association(self):
         """
         Check if association is a cycle
@@ -87,11 +102,13 @@ class HoseContent(models.Model):
     """
     hose_from = models.ForeignKey(
         HoseAssociation,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='hose_origin'
     )
     uploader = models.OneToOneField(
         HoseUser,
         on_delete=models.CASCADE,
+        related_name='user_origin',
         null=True
     )
     name = models.CharField(max_length=300, default='')
@@ -116,12 +133,12 @@ class AssociationDemand(models.Model):
     sender = models.ForeignKey(
         HoseUser,
         on_delete=models.CASCADE,
-        related_name='sender'
+        related_name='sender_origin'
     )
     receiver = models.ForeignKey(
         HoseUser,
         on_delete=models.CASCADE,
-        related_name='receiver'
+        related_name='receiver_origin'
     )
     time_sent = models.DateTimeField(auto_now_add=True)
     caduce_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(days=15))
