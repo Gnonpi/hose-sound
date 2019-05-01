@@ -1,11 +1,11 @@
 import json
+import logging
 
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.views import generic
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,51 +15,7 @@ from hose_usage.forms import UploadSongForm
 from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 import hose_usage.permissions as hose_permissions
 
-
-class HomeView(generic.ListView):
-    """Home view of user"""
-    template_name = 'hose_usage/index.html'
-    context_object_name = 'hoses_shared'
-
-    def get_queryset(self):
-        user_id = self.request.user.id
-        h_associations = HoseAssociation.objects. \
-            filter(Q(first_end__id=user_id) | Q(second_end__id=user_id)). \
-            order_by('-time_last_update').all()
-        results = []
-        for ha in h_associations:
-            ha_dict = ha.as_dict()
-            nb_songs = HoseContent.objects.filter(hose_from__id=ha.id).count()
-            ha_dict['nb_songs'] = nb_songs
-            if ha_dict['first_end_id'] == user_id:
-                ha_dict['other_user_username'] = ha_dict['second_end_username']
-            else:
-                ha_dict['other_user_username'] = ha_dict['first_end_username']
-            results.append(ha_dict)
-        return results
-
-
-class LinkedHosesView(generic.ListView):
-    """User view to see their linked hoses"""
-    template_name = 'hose_usage/hoses.html'
-    context_object_name = 'hoses_shared'
-
-    def get_queryset(self):
-        user_id = self.request.user.id
-        h_associations = HoseAssociation.objects. \
-            filter(Q(first_end__id=user_id) | Q(second_end__id=user_id)). \
-            order_by('-time_created').all()
-        results = []
-        for ha in h_associations:
-            nb_songs = HoseContent.objects.filter(hose_from__id=ha.id).count()
-            ha_dict = ha.as_dict()
-            if ha_dict['first_end_id'] == user_id:
-                ha_dict['other_user_username'] = ha_dict['second_end_username']
-            else:
-                ha_dict['other_user_username'] = ha_dict['first_end_username']
-            ha_dict['nb_songs'] = nb_songs
-            results.append(ha_dict)
-        return results
+django_logger = logging.getLogger('hose_usage.views')
 
 
 def browse_hosers(request):
@@ -246,8 +202,9 @@ class HoseCur(APIView):
         }
         return Response(trunc_serialized)
 
-
-## REST views
+# ------------------------------------
+# # REST views
+# ------------------------------------
 class HoseUserList(APIView):
     permission_classes = (permissions.IsAuthenticated,
                           hose_permissions.IsOwnerOf)
@@ -276,7 +233,24 @@ class HoseUserDetail(APIView):
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
         serialized = HoseUserSerializer(user)
-        return Response(serialized.data)
+        if request.user == user:
+            django_logger.debug('See own user')
+            return Response(serialized.data)
+        else:
+            hose = HoseAssociation.objects.filter(
+                Q(first_end=request.user) | Q(second_end=user)
+            ).count()
+            if hose >= 1:
+                django_logger.debug('See other user truncated')
+                trunc_serialized = {
+                    'id': int(serialized['id'].value),
+                    'username': str(serialized['username'].value),
+                    'accessible_hoses': []
+                }
+                return Response(trunc_serialized, status=status.HTTP_200_OK)
+            else:
+                django_logger.debug('No link with user, no access')
+                return Response({'error': f'No rights to access'}, status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request, pk, format=None):
         user = self.get_object(pk)

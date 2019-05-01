@@ -7,9 +7,7 @@ from . import views
 app_name = 'h'
 urlpatterns = [
     ## User objects
-    path('home/', login_required(views.HomeView.as_view()), name='home'),
     path('demands/', login_required(views.see_hose_demands), name='see_demands'),
-    path('hoses/', login_required(views.LinkedHosesView.as_view()), name='see_hoses'),
 
     ## Browse objects
     path('browse-hosers/', login_required(views.browse_hosers), name='browse_hosers'),

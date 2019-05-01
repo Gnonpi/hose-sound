@@ -5,13 +5,14 @@
     </b-navbar-brand>
     <b-navbar-brand>
       <h2>
-        <router-link id="link-back-user"
-                     :to="{
-          name: 'UserHomePage',
-          params: {
-            username: loggedUsername,
-            userId: loggedUserId}
-          }">
+        <router-link
+          id="link-back-user"
+          :to="{
+            name: 'UserHomePage',
+            params: {
+              username: loggedUsername,
+              userId: loggedUserId}
+        }">
           {{ loggedUsername }}
         </router-link>
       </h2>
