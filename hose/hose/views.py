@@ -1,9 +1,8 @@
+import json
 import logging
 
 from rest_framework import status
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from hose_usage.models import HoseUser
 from hose_usage.serializers import HoseUserSerializer
@@ -20,21 +19,28 @@ def legals(request):
 
 def signup(request):
     logger.debug('Hit the signup')
-    username = request.body.json['username']
-    if HoseUser.objects.filter(username=username).any():
-        return Response({'error': 'Username already used'}, status=status.HTTP_409_CONFLICT)
-    email = request.body.json['email']
-    if HoseUser.objects.filter(email=email).any():
-        return Response({'error': 'Email already used'}, status=status.HTTP_409_CONFLICT)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Wrong method to signup, expect POST'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    json_body = json.loads(request.body)
 
-    serialized = HoseUserSerializer(data=request.DATA)
+    # todo: start using json_schema
+    if set(json_body) != {'username', 'email', 'password'}:
+        return JsonResponse({'error': 'Wrong payload, expecting username+email+password'}, status=status.HTTP_400_BAD_REQUEST)
+
+    username = json_body['username']
+    email = json_body['email']
+    if HoseUser.objects.filter(username=username).first():
+        return JsonResponse({'error': 'Username already used'}, status=status.HTTP_409_CONFLICT)
+    if HoseUser.objects.filter(email=email).first():
+        return JsonResponse({'error': 'Email already used'}, status=status.HTTP_409_CONFLICT)
+
+    serialized = HoseUserSerializer(data=json_body)
     if serialized.is_valid():
         HoseUser.objects.create_user(
-            username=serialized.init_data['username'],
-            email=serialized.init_data['email'],
-            password=serialized.init_data['password']
+            username=json_body['username'],
+            email=json_body['email'],
+            password=json_body['password']
         )
-        return Response(serialized.data, status=status.HTTP_201_CREATED)
+        return JsonResponse({'data': f'User {username} was created'}, status=status.HTTP_201_CREATED)
     else:
-        return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return JsonResponse(serialized._errors, status=status.HTTP_400_BAD_REQUEST)

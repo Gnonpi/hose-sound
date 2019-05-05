@@ -6,33 +6,33 @@ from django.urls import reverse_lazy, reverse
 
 from hose_usage.models import HoseUser, HoseAssociation, AssociationDemand
 
-
-@pytest.fixture(scope='function')
-def my_logged_client(request, django_user_model, client):
-    username = 'test_user'
-    email = 'test_user@test.com'
-    password = 'test_test_test_pwsd'
-    user = django_user_model.objects.create(
-        username=username,
-        email=email,
-        password=password
-    )
-    user.save()
-    user_info = {
-        'username': username,
-        'email': email,
-        'password': password,
-        'user_id': user.id,
-    }
-    request.addfinalizer(user.delete)
-    is_logged = client.login(username=username, password=password)
-    print(f'is_logged: {is_logged}')
-    client._login(user)
-    return request, client, user_info
+#
+# @pytest.fixture(scope='function')
+# def my_logged_client(request, django_user_model, client):
+#     username = 'test_user'
+#     email = 'test_user@test.com'
+#     password = 'test_test_test_pwsd'
+#     user = django_user_model.objects.create(
+#         username=username,
+#         email=email,
+#         password=password
+#     )
+#     user.save()
+#     user_info = {
+#         'username': username,
+#         'email': email,
+#         'password': password,
+#         'user_id': user.id,
+#     }
+#     request.addfinalizer(user.delete)
+#     is_logged = client.login(username=username, password=password)
+#     print(f'is_logged: {is_logged}')
+#     client._login(user)
+#     return request, client, user_info
 
 
 def test_unauthenticated_user_index(client):
-    response = client.get(reverse_lazy('h:home'))
+    response = client.get(reverse_lazy('home'))
     assert response.status_code == 302
 
 

@@ -23,8 +23,6 @@ from hose import views
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
-    path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
-    # path('legal/', TemplateView.as_view(template_name='legals.html'), name='legal'),
     path('legals/', views.legals, name='legals'),
     path('admin/', admin.site.urls),
 
@@ -32,7 +30,7 @@ urlpatterns = [
 
     path('api-auth', include('rest_framework.urls')),
     path('signup/', views.signup, name='signup'),
-    url(r'^auth/api-token-auth/', obtain_jwt_token),
-    url(r'^auth/api-token-refresh/', refresh_jwt_token),
-    url(r'^auth/api-token-verify/', verify_jwt_token),
+    url(r'^auth/api-token-auth/', obtain_jwt_token, name='obtain_jwt'),
+    url(r'^auth/api-token-refresh/', refresh_jwt_token, name='refresh_jwt'),
+    url(r'^auth/api-token-verify/', verify_jwt_token, name='verify_jwt'),
 ]
