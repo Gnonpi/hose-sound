@@ -23,38 +23,37 @@ RUN mkdir -p ${STORE_STATIC_DIR}/templates && \
 
 RUN cd ${FRONT_HOSE_DIR} && \
     yarn install --prod && \
+    yarn add semver
+# npm apparently doesn't bring semver
+RUN cd ${FRONT_HOSE_DIR} && \
     yarn run build
 
-RUN cp -R ./hose/templates ${STORE_STATIC_DIR}/templates && \
-    cp -R ./hose/static ${STORE_STATIC_DIR}/static
-
-RUN ls ${STORE_STATIC_DIR}/templates && \
-    ls ${STORE_STATIC_DIR}/static
 
 # Build back-end
 FROM python:3.6-alpine
 
 ENV PYTHONUNBUFFERED 1
-ENV store_static_dir /tmp/front_hose-built
 
-RUN mkdir /code
-WORKDIR /code
+ENV HOSE_DIR /opt/hose-sound
+ENV FRONT_HOSE_DIR /opt/front_hose/
+ENV STORE_STATIC_DIR /opt/
 
-COPY ../../../pyproject.toml poetry.lock ${WORK_DIR}/
-# RUN apk update && apk add libc-dev gcc
-RUN pip install --upgrade pip && \
+COPY --from=clone-repo-stage ${HOSE_DIR} ${HOSE_DIR}
+RUN rm -rf ${HOSE_DIR}/hose/front_hose
+
+ RUN apk update && apk add postgresql-dev gcc
+RUN cd ${HOSE_DIR} && \
+    pip install --upgrade pip && \
     pip install --upgrade poetry && \
     poetry config settings.virtualenvs.create false && \
     poetry install --no-dev && \
     pip uninstall -y poetry
-
-COPY ../../../hose/hose ./hose/hose
-COPY ../../../hose/hose_usage ./hose/hose_usage
-COPY ../../../hose/.env ./hose/manage.py ./hose/
 
 RUN mkdir -p ./hose/templates && mkdir -p ./hose/static
 COPY --from=front-stage ${STORE_STATIC_DIR}/templates ./hose/templates
 COPY --from=front-stage ${STORE_STATIC_DIR}/static ./hose/static
 
 EXPOSE 8000
-CMD ["python3", "hose/manage.py", "runserver"]
+RUN ls ${HOSE_DIR}/hose
+WORKDIR ${HOSE_DIR}/hose
+CMD ["python3", "manage.py", "runserver"]
