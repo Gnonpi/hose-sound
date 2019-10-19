@@ -1,9 +1,10 @@
 # Download git repo
 FROM alpine:latest AS clone-repo-stage
 
+ARG GIT_BRANCH
 ENV PATH_CLONE /opt/hose-sound
 RUN apk update && apk add git
-RUN git clone https://github.com/Gnonpi/hose-sound ${PATH_CLONE}
+RUN git clone --depth 1 -b ${GIT_BRANCH} https://github.com/Gnonpi/hose-sound ${PATH_CLONE}
 
 # Build front-end
 FROM node:11-alpine AS front-stage
