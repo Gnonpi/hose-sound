@@ -88,6 +88,7 @@ with open(str(path_env), 'r') as f_env:
         if '=' in line:
             key, value = line.split('=')
             env[key] = value.strip()
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

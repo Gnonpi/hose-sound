@@ -3,6 +3,7 @@ services:
   db:
     build: ../containers/hose-db/
     container_name: hose-db
+    hostname: hosedb
     ports:
       - "5432:5432"
     environment:
@@ -18,9 +19,12 @@ services:
       context: ../containers/hose-server/
       args:
         GIT_BRANCH: create-docker
+        IS_LOCAL: 0
     container_name: hose-server
     ports:
       - "8000:8000"
+    volumes:
+      - ../:/tmp/hose-local-repo
     depends_on:
       - db
 

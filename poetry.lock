@@ -160,6 +160,14 @@ version = "1.7.1"
 apipkg = ">=1.4"
 
 [[package]]
+category = "main"
+description = "WSGI HTTP Server for UNIX"
+name = "gunicorn"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*"
+version = "19.9.0"
+
+[[package]]
 category = "dev"
 description = "python humanize utilities"
 name = "humanize"
@@ -549,7 +557,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "769384de635a4c007b5aae6eba10205ed25fc5253944f7a82def8ddbc9edc44f"
+content-hash = "34f9cc58c50d7e1218c38d24a6a0c562fb386336033a7483538485c42b942a7b"
 python-versions = "^3.6.5"
 
 [metadata.hashes]
@@ -570,6 +578,7 @@ django-webpack-loader = ["60bab6b9a037a5346fad12d2a70a6bc046afb33154cf75ed640b93
 djangorestframework = ["5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8", "dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"]
 djangorestframework-jwt = ["5efe33032f3a4518a300dc51a51c92145ad95fb6f4b272e5aa24701db67936a7", "ab15dfbbe535eede8e2e53adaf52ef0cf018ee27dbfad10cbc4cbec2ab63d38c"]
 execnet = ["cacb9df31c9680ec5f95553976c4da484d407e85e41c83cb812aa014f0eddc50", "d4efd397930c46415f62f8a31388d6be4f27a91d7550eb79bc64a756e0056547"]
+gunicorn = ["aa8e0b40b4157b36a5df5e599f45c9c76d6af43845ba3b3b0efe2c70473c2471", "fa2662097c66f920f53f70621c6c58ca4a3c4d3434205e608e121b5b3b71f4f3"]
 humanize = ["a43f57115831ac7c70de098e6ac46ac13be00d69abbf60bdcac251344785bb19"]
 importlib-metadata = ["aa18d7378b00b40847790e7c27e11673d7fed219354109d0e7b9e5b25dc3ad26", "d5f18a79777f3aa179c145737780282e27b508fc8fd688cb17c7a813e8bd39af"]
 ipython = ["c4ab005921641e40a68e405e286e7a1fcc464497e14d81b6914b4fd95e5dee9b", "dd76831f065f17bddd7eaa5c781f5ea32de5ef217592cf019e34043b56895aa1"]

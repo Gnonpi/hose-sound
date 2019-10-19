@@ -2,10 +2,12 @@
 FROM alpine:latest AS clone-repo-stage
 
 ARG GIT_BRANCH
+ARG IS_LOCAL
 ENV PATH_CLONE /opt/hose-sound
 RUN apk update && apk add git
 RUN git clone --depth 1 -b ${GIT_BRANCH} https://github.com/Gnonpi/hose-sound ${PATH_CLONE}
 
+RUN if [ ${IS_LOCAL} == "1" ]; then rm -rf ${PATH_CLONE} && mv /tmp/hose-local-repo ${PATH_CLONE}; fi
 # Build front-end
 FROM node:11-alpine AS front-stage
 
@@ -56,4 +58,4 @@ COPY .env ${HOSE_DIR}/hose/.env
 EXPOSE 8000
 COPY entrypoint.sh /opt/bin/entrypoint.sh
 RUN chmod a+x /opt/bin/entrypoint.sh
-CMD ["sh", "./opt/bin/entrypoint.sh"]
+CMD ["sh", "/opt/bin/entrypoint.sh"]
