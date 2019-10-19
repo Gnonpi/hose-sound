@@ -1,4 +1,4 @@
-require('babel-register')
+// require('babel-register')
 var config = require('../../config')
 
 // http://nightwatchjs.org/gettingstarted#settings-file
@@ -6,6 +6,12 @@ module.exports = {
   src_folders: ['test/e2e/specs'],
   output_folder: 'test/e2e/reports',
   custom_assertions_path: ['test/e2e/custom-assertions'],
+  globals_path: 'test/e2e/shared.js',
+
+  test_workers: {
+    enabled: true,
+    workers: 'auto'
+  },
 
   selenium: {
     start_process: true,

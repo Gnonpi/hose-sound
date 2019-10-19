@@ -5,18 +5,18 @@
       {{ alertMessage }}
     </b-alert>
     <b-form id="register-form">
-      <b-form-group label="Email" label-for="in-email" id="in-email-group"
+      <b-form-group label="Email" label-for="r-in-email" id="in-email-group"
           description="We'll never share your email with anyone else.">
         <b-form-input
-          id="in-email"
+          id="r-in-email"
           v-model="registerEmail"
           type="email"
           placeholder="Email"
           required></b-form-input>
       </b-form-group>
-      <b-form-group label="Username" label-for="in-username" id="in-username-group">
+      <b-form-group label="Username" label-for="r-in-username" id="in-username-group">
         <b-form-input
-          id="in-username"
+          id="r-in-username"
           v-model="registerUsername"
           type="text"
           placeholder="Username"
@@ -24,9 +24,9 @@
           maxLength="100"
         ></b-form-input>
       </b-form-group>
-      <b-form-group label="Password" label-for="in-password1" id="in-password1-group">
+      <b-form-group label="Password" label-for="r-in-password1" id="in-password1-group">
         <b-form-input
-          id="in-password1"
+          id="r-in-password1"
           v-model="registerPassword1"
           type="password"
           placeholder="Password"
@@ -34,10 +34,10 @@
           maxLength="150"
         ></b-form-input>
       </b-form-group>
-      <b-form-group label="Repeat password" label-for="in-password2" id="in-password2-group"
+      <b-form-group label="Repeat password" label-for="r-in-password2" id="in-password2-group"
                     description="Just to be sure">
         <b-form-input
-          id="in-password2"
+          id="r-in-password2"
           v-model="registerPassword2"
           type="password"
           placeholder="Password"

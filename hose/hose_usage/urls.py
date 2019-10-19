@@ -11,11 +11,6 @@ urlpatterns = [
 
     ## Browse objects
     path('browse-hosers/', login_required(views.browse_hosers), name='browse_hosers'),
-    # path('browse-content/', views., name='browse_content'),
-
-    ## Show object detail
-    path('hose/<int:hose_id>/', login_required(views.show_hose), name='show_hose'),
-    path('hoser/<int:hoser_id>/', login_required(views.show_hoser), name='show_hoser'),
 
     ## Hose creation
     path('hoser/<int:hoser_id>/ask', login_required(views.ask_for_hose_creation), name='hoser_ask'),
@@ -24,9 +19,9 @@ urlpatterns = [
     # path('hose/<int:hose-pk>/<int:content-pk>', views., name='show_content'),
     path('hose/<int:hose_id>/upload', login_required(views.upload_song), name='upload_song'),
 
+    ## REST url
     path('cur', views.HoseCur.as_view(), name='current_hoser'),
 
-    ## REST url
     path('rest/hosers', views.HoseUserList.as_view(), name='rest_hose_users_list'),
     path('rest/hoser/<int:pk>', views.HoseUserDetail.as_view(), name='rest_hose_user_detail'),
     path('rest/hose/<int:pk>', views.HoseAssociationDetail.as_view(), name='rest_hose_detail'),

@@ -1,7 +1,7 @@
 <template>
   <main>
     <UpNavBarComp></UpNavBarComp>
-    <h1>User: {{ username }}</h1>
+    <h2>User: {{ username }}</h2>
     <div id="displayed-hoses">
       <div v-for="(hose, index) in accessibleHoses" :key="index">
         <b-card :id="'hose-card-' + index">

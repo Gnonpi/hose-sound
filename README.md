@@ -44,7 +44,6 @@ you can go for it in your browser or
 start toying with the models in django-shell.
 
 ### Running the tests
-
 🔧
 Shame on me!
 

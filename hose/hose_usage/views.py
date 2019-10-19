@@ -7,10 +7,12 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from rest_framework import status, permissions
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer, HoseContentSerializer
+from hose_usage.serializers import HoseUserSerializer, HoseAssociationSerializer, HoseContentSerializer, \
+    AssociationDemandSerializer
 from hose_usage.forms import UploadSongForm
 from hose_usage.models import HoseUser, HoseAssociation, HoseContent, AssociationDemand
 import hose_usage.permissions as hose_permissions
@@ -39,53 +41,6 @@ def browse_hosers(request):
     return render(request, 'hose_usage/browse_hosers.html', {
         'hose_users': hus,
     })
-
-
-def show_hoser(request, hoser_id):
-    """Render minimal info about a user"""
-    template_name = 'hose_usage/show_hoser.html'
-    user_id = request.user.id
-    hu = get_object_or_404(HoseUser, pk=hoser_id)
-    other_id = hu.id
-    ha = HoseAssociation.objects. \
-        filter(
-            (Q(first_end=user_id) and Q(second_end=other_id))
-            or
-            (Q(first_end=other_id) and Q(second_end=user_id))
-        )
-    context = {
-        'hoser_username': hu.username,
-        'has_hose': False,
-        'hose_association_id': -1,
-        'hose_association_name': -1,
-    }
-    if len(ha) > 0:
-        context['has_hose'] = True
-        context['hose_association_id'] = ha[0].id
-        context['hose_association_name'] = ha[0].hose_name
-    return render(request, template_name, context)
-
-
-def show_hose(request, hose_id):
-    """Show the details of one Hose"""
-    user_id = request.user.id
-    ha = get_object_or_404(HoseAssociation, pk=hose_id)
-    if user_id != ha.first_end.id and user_id != ha.second_end.id:
-        return Http404('<h1>Hose was not found</h1>')
-    template_name = 'hose_usage/show_hose.html'
-    other_end = ha.second_end
-    if user_id == ha.second_end.id:
-        other_end = ha.first_end
-    songs = HoseContent.objects.filter(hose_from__id=ha.id).order_by('-time_added').all()
-    context = {
-        'hose_name': ha.hose_name,
-        'time_created': ha.time_created,
-        'time_last_update': ha.time_last_update,
-        'other_username': other_end.username,
-        'other_id': other_end.id,
-        'songs': songs
-    }
-    return render(request, template_name, context)
 
 
 def ask_for_hose_creation(request, hoser_id):
@@ -210,6 +165,7 @@ class HoseUserList(APIView):
                           hose_permissions.IsOwnerOf)
 
     def get(self, request, format=None):
+        logger.warning('returning all user, limit this')
         users = HoseUser.objects.all()
         users_serialized = HoseUserSerializer(users, many=True)
         return Response(users_serialized.data)
@@ -315,3 +271,15 @@ class HoseContentList(APIView):
         contents_serialized = HoseContentSerializer(contents, many=True)
         return Response(contents_serialized.data, status=status.HTTP_200_OK)
 
+
+class AssociationDemandDetail(APIView):
+    permission_classes = (permissions.IsAuthenticated, hose_permissions.IsOwnerOf,)
+
+    def get(self, request, pk, format=None):
+        demand = get_object_or_404(AssociationDemand, pk=pk)
+        serialized = AssociationDemandSerializer(demand)
+        return serialized
+
+
+class AssociationDemandList(ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)

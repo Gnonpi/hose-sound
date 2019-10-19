@@ -49,8 +49,6 @@ class TestSignup:
             'password': user_info['password'] + 'o'
         }
         response = client.post(reverse('signup'), already_not_serializable, content_type=JSON_HEADER)
-        print(response.status_code)
-        print(response.content)
         assert response.status_code == 400
         assert 'Not a valid string' in response.content.decode('utf8')
 
@@ -75,7 +73,7 @@ class TestSignup:
 
 class TestObtainToken:
     def test_wrong_payload(self, client):
-        response = client.post(reverse('obtain_jwt'), {'cacao': 'chocolat'}, content_type=JSON_HEADER)
+        response = client.post(reverse('obtain_jwt'), {'cacao': 'chocolat'})
         assert response.status_code == 400
         assert 'This field is required' in response.content.decode('utf8')
 
@@ -84,29 +82,27 @@ class TestObtainToken:
         user = HoseUser.objects.filter(username=test_none_user).all()
         assert len(user) == 0
         response = client.post(reverse('obtain_jwt'),
-                               {'username': test_none_user, 'password': 'ajax'}, content_type=JSON_HEADER)
+                               {'username': test_none_user, 'password': 'ajax'})
         assert response.status_code == 400
         assert 'Unable to log in with provided credentials.' in response.content.decode('utf8')
 
     def test_valid_login(self, client, create_test_user):
         user, user_info = create_test_user
-        response = client.post(reverse('obtain_jwt'),
-                               {
-                                   'username': user_info['username'],
-                                   'password': user_info['password']
-                               },
-                               content_type=JSON_HEADER)
+        response = client.post(
+            reverse('obtain_jwt'),
+            {'username': user_info['username'], 'password': user_info['password']}
+        )
         print(response.status_code)
         print(response.content)
         assert False
 
-
-class TestRefreshToken:
-    def test_(self):
-        assert False
-
-
-class TestVerifyToken:
-    def test_(self):
-        assert False
+#
+# class TestRefreshToken:
+#     def test_(self):
+#         assert False
+#
+#
+# class TestVerifyToken:
+#     def test_(self):
+#         assert False
 

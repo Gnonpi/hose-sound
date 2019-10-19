@@ -5,9 +5,9 @@
         {{ alertMessage }}
       </b-alert>
       <b-form id="login-form">
-        <b-form-group label="Username" label-for="in-username" id="in-username-group">
+        <b-form-group label="Username" label-for="l-in-username" id="in-username-group">
           <b-form-input
-            id="in-username"
+            id="l-in-username"
             v-model="username"
             type="text"
             placeholder="Username"
@@ -15,9 +15,9 @@
             required
             maxlength="150"></b-form-input>
         </b-form-group>
-        <b-form-group label="Password" label-for="in-pwsd" id="in-pwsd-group">
+        <b-form-group label="Password" label-for="l-in-pswd" id="in-pswd-group">
           <b-form-input
-            id="in-pwsd"
+            id="l-in-pswd"
             v-model="password"
             type="password"
             placeholder="Password"

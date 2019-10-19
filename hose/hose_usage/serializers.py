@@ -21,15 +21,7 @@ class HoseUserSerializer(serializers.ModelSerializer):
 class HoseAssociationSerializer(serializers.ModelSerializer):
     first_end_username = serializers.ReadOnlyField(source='first_end.username')
     second_end_username = serializers.ReadOnlyField(source='second_end.username')
-    # I prefer having the contents returned at same time as Hose
-    # hose_origin = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    # accessible_contents = serializers.SerializerMethodField('get_contents')
     number_of_songs = serializers.SerializerMethodField()
-
-    # def get_contents(self, association):
-    #     qs = HoseContent.objects.filter(hose_from=association).all()
-    #     contents_serialized = HoseContentSerializer(instance=qs, many=True)
-    #     return contents_serialized.data
 
     def get_number_of_songs(self, association):
         nb_songs = HoseContent.objects.filter(hose_from=association).count()
