@@ -41,19 +41,19 @@ ENV STORE_STATIC_DIR /opt/
 COPY --from=clone-repo-stage ${HOSE_DIR} ${HOSE_DIR}
 RUN rm -rf ${HOSE_DIR}/hose/front_hose
 
- RUN apk update && apk add postgresql-dev gcc
+ RUN apk update && apk add postgresql-dev gcc musl-dev
 RUN cd ${HOSE_DIR} && \
     pip install --upgrade pip && \
     pip install --upgrade poetry && \
     poetry config settings.virtualenvs.create false && \
-    poetry install --no-dev && \
-    pip uninstall -y poetry
+    poetry install --no-dev
 
 RUN mkdir -p ./hose/templates && mkdir -p ./hose/static
 COPY --from=front-stage ${STORE_STATIC_DIR}/templates ./hose/templates
 COPY --from=front-stage ${STORE_STATIC_DIR}/static ./hose/static
+COPY .env ${HOSE_DIR}/hose/.env
 
 EXPOSE 8000
-RUN ls ${HOSE_DIR}/hose
-WORKDIR ${HOSE_DIR}/hose
-CMD ["python3", "manage.py", "runserver"]
+COPY entrypoint.sh /opt/bin/entrypoint.sh
+RUN chmod a+x /opt/bin/entrypoint.sh
+CMD ["sh", "./opt/bin/entrypoint.sh"]
