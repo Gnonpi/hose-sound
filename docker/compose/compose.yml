@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  db:
+    build: ../containers/hose-db/
+    ports:
+      - "5432:5432"
+    environment:
+      # TODO: do this with config file
+      POSTGRES_PASSWORD: hose-password
+      POSTGRES_USER: hoser
+      POSTGRES_DB: hosedb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  server:
+    build: ../containers/hose-server/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  build_front:
+  build_front_static:
